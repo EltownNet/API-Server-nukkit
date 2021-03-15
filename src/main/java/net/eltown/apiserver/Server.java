@@ -2,11 +2,12 @@ package net.eltown.apiserver;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
-import net.eltown.apiserver.components.handler.EconomyHandler;
-import net.eltown.apiserver.components.handler.PlayerHandler;
+import net.eltown.apiserver.components.handler.economy.EconomyHandler;
+import net.eltown.apiserver.components.handler.player.PlayerHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,11 +19,13 @@ import java.time.LocalDateTime;
 public class Server {
 
     private Connection connection;
+    @Getter
+    private Config config;
 
     @SneakyThrows
     public void start() {
         this.log("Server wird gestartet...");
-        Config config = new Config(this.getDataFolder() + "/config.yml", Config.YAML);
+        this.config = new Config(this.getDataFolder() + "/config.yml", Config.YAML);
         config.reload();
         config.save();
         if (!config.exists("MongoDB")) {
@@ -40,11 +43,11 @@ public class Server {
         this.log("Erfolgreich mit RabbitMQ verbunden.");
 
         this.log("Starte EconomyHandler...");
-        EconomyHandler economyHandler = new EconomyHandler(this.connection);
+        EconomyHandler economyHandler = new EconomyHandler(this, this.connection);
         this.log("EcomomyHandler erfolgreich gestartet.");
 
         this.log("Starte PlayerHandler...");
-        PlayerHandler playerHandler = new PlayerHandler(this.connection);
+        PlayerHandler playerHandler = new PlayerHandler(this, this.connection);
         this.log("PlayerHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");

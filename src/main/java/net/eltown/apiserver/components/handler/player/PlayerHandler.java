@@ -1,19 +1,24 @@
-package net.eltown.apiserver.components.handler;
+package net.eltown.apiserver.components.handler.player;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.DeliverCallback;
 import lombok.SneakyThrows;
+import net.eltown.apiserver.Server;
+import net.eltown.apiserver.components.handler.Handler;
 
 import java.nio.charset.StandardCharsets;
 
-public class EconomyHandler extends Handler {
+public class PlayerHandler extends Handler {
 
     private final Channel channel;
 
     @SneakyThrows
-    public EconomyHandler(final Connection connection) {
+    public PlayerHandler(final Server server, final Connection connection) {
         this.channel = connection.createChannel();
-        this.channel.queueDeclare("economy", false, false, false, null);
-        this.channel.queuePurge("economy");
+        this.channel.queueDeclare("playersync", false, false, false, null);
+        this.channel.queuePurge("playersync");
         this.channel.basicQos(1);
 
         this.startListening();
@@ -36,7 +41,7 @@ public class EconomyHandler extends Handler {
             this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         };
 
-        this.channel.basicConsume("economy", false, callback, (consumerTag -> { }));
+        this.channel.basicConsume("playersync", false, callback, (consumerTag -> { }));
     }
 
 }
