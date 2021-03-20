@@ -15,22 +15,33 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
+
+    @Getter
+    private ExecutorService executor;
 
     private Connection connection;
     @Getter
     private Config config;
 
+    private EconomyHandler economyHandler;
+    private PlayerHandler playerHandler;
+
     @SneakyThrows
     public void start() {
         this.log("Server wird gestartet...");
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.log(Runtime.getRuntime().availableProcessors() + " Threads erstellt.");
         this.config = new Config(this.getDataFolder() + "/config.yml", Config.YAML);
         config.reload();
         config.save();
         if (!config.exists("MongoDB")) {
             config.set("MongoDB.Uri", "ENTER");
-            config.set("MongoDB.EconomyDB", "eltown");
+            config.set("MongoDB.PlayerDB", "eltown");
         }
         config.save();
 
@@ -43,11 +54,11 @@ public class Server {
         this.log("Erfolgreich mit RabbitMQ verbunden.");
 
         this.log("Starte EconomyHandler...");
-        EconomyHandler economyHandler = new EconomyHandler(this, this.connection);
+        this.economyHandler = new EconomyHandler(this, this.connection);
         this.log("EcomomyHandler erfolgreich gestartet.");
 
         this.log("Starte PlayerHandler...");
-        PlayerHandler playerHandler = new PlayerHandler(this, this.connection);
+        this.playerHandler = new PlayerHandler(this, this.connection);
         this.log("PlayerHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
@@ -66,17 +77,22 @@ public class Server {
         return Loader.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("api-server.jar", "");
     }
 
-    @SneakyThrows
     public void log(String message) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        LocalDateTime time = timestamp.toLocalDateTime();
-        System.out.println(Colors.ANSI_CYAN + time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + Colors.ANSI_WHITE + " [" + Colors.ANSI_BLUE + "LOG" + Colors.ANSI_WHITE + "] " + message);
-        String file = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + " [LOG] " + message + "\n";
-        Files.write(Paths.get("server.log"),
-                file.getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND
-        );
+        CompletableFuture.runAsync(() -> {
+            try {
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                LocalDateTime time = timestamp.toLocalDateTime();
+                System.out.println(Colors.ANSI_CYAN + time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + Colors.ANSI_WHITE + " [" + Colors.ANSI_BLUE + "LOG" + Colors.ANSI_WHITE + "] " + message);
+                String file = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + " [LOG] " + message + "\n";
+                Files.write(Paths.get("server.log"),
+                        file.getBytes(StandardCharsets.UTF_8),
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.APPEND
+                );
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
 }

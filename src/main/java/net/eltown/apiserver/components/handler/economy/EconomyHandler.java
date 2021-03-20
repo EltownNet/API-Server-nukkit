@@ -3,11 +3,10 @@ package net.eltown.apiserver.components.handler.economy;
 import com.rabbitmq.client.*;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
-import net.eltown.apiserver.components.handler.Handler;
 
 import java.nio.charset.StandardCharsets;
 
-public class EconomyHandler extends Handler {
+public class EconomyHandler {
 
     private final Channel channel;
     private final Server server;
@@ -22,50 +21,55 @@ public class EconomyHandler extends Handler {
         this.channel.queuePurge("economy");
         this.channel.basicQos(1);
 
-        this.startListening();
+        this.startCallbacking();
     }
 
-    @Override
-    @SneakyThrows
-    public void startListening() {
-        final DeliverCallback callback = (tag, delivery) -> {
-            final AMQP.BasicProperties replyProps = new AMQP.BasicProperties
-                    .Builder()
-                    .correlationId(delivery.getProperties().getCorrelationId())
-                    .build();
+    public void startCallbacking() {
+        server.getExecutor().execute(() -> {
+            try {
+                final DeliverCallback callback = (tag, delivery) -> {
+                    final AMQP.BasicProperties replyProps = new AMQP.BasicProperties
+                            .Builder()
+                            .correlationId(delivery.getProperties().getCorrelationId())
+                            .build();
 
-            final String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                    final String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-            final String[] request = message.split("//");
+                    final String[] request = message.split("//");
 
-            this.server.log("[«] " + request[0].toUpperCase());
+                    this.server.log("[" + Thread.currentThread().getName() + "] " + "[«] " + request[0].toUpperCase());
 
-            switch (EconomyCalls.valueOf(request[0].toUpperCase())) {
-                case REQUEST_GETMONEY:
-                    this.publish(delivery, replyProps, EconomyCalls.CALLBACK_MONEY.name() + "//" + this.provider.get(request[1]));
-                    break;
-                case REQUEST_SETMONEY:
-                    this.provider.set(request[1], Double.parseDouble(request[2]));
-                    this.publish(delivery, replyProps, EconomyCalls.CALLBACK_NULL.name());
-                    break;
-                case REQUEST_ACCOUNTEXISTS:
-                    this.publish(delivery, replyProps, EconomyCalls.CALLBACK_ACCOUNTEXISTS.name() + "//" + this.provider.has(request[1]));
-                    break;
-                case REQUEST_CREATEACCOUNT:
-                    this.provider.create(request[1], Double.parseDouble(request[2]));
-                    this.publish(delivery, replyProps, EconomyCalls.CALLBACK_NULL.name());
-                    break;
+                    switch (EconomyCalls.valueOf(request[0].toUpperCase())) {
+                        case REQUEST_GETMONEY:
+                            this.publish(delivery, replyProps, EconomyCalls.CALLBACK_MONEY.name() + "//" + this.provider.get(request[1]));
+                            break;
+                        case REQUEST_SETMONEY:
+                            this.provider.set(request[1], Double.parseDouble(request[2]));
+                            this.publish(delivery, replyProps, EconomyCalls.CALLBACK_NULL.name());
+                            break;
+                        case REQUEST_ACCOUNTEXISTS:
+                            this.publish(delivery, replyProps, EconomyCalls.CALLBACK_ACCOUNTEXISTS.name() + "//" + this.provider.has(request[1]));
+                            break;
+                        case REQUEST_CREATEACCOUNT:
+                            this.provider.create(request[1], Double.parseDouble(request[2]));
+                            this.publish(delivery, replyProps, EconomyCalls.CALLBACK_NULL.name());
+                            break;
+                    }
+                };
+
+                this.channel.basicConsume("economy", false, callback, (consumerTag -> {
+                }));
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        };
-
-        this.channel.basicConsume("economy", false, callback, (consumerTag -> { }));
+        });
     }
 
     @SneakyThrows
     private void publish(final Delivery delivery, final AMQP.BasicProperties props, String message) {
         this.channel.basicPublish("", delivery.getProperties().getReplyTo(), props, message.getBytes(StandardCharsets.UTF_8));
         this.channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-        this.server.log("[»] " + message.split("//")[0]);
+        this.server.log("[" + Thread.currentThread().getName() + "] " + "[»] " + message.split("//")[0]);
     }
 
 }
