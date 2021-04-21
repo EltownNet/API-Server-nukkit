@@ -58,18 +58,33 @@ public class GroupHandler {
                             } else request.answer(GroupCalls.CALLBACK_GROUP_PERMISSION_NOT_ADDED.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
                         break;
-                    case REQUEST_GROUP_PERMISSIONS:
-                        final Group group = this.provider.groups.get(this.provider.groupedPlayers.get(request.getData()[1]).getGroup());
-                        final List<String> list = new ArrayList<>(group.getPermissions());
+                    case REQUEST_FULL_GROUP:
+                        final Group group = this.provider.groups.get(request.getData()[1]);
+                        final List<String> lPermissions = new ArrayList<>(group.getPermissions());
 
                         for (final String s : group.getInheritances()) {
                             final Group iGroup = this.provider.groups.get(s);
                             for (final String f : iGroup.getPermissions()) {
-                                if (!list.contains(f)) list.add(f);
+                                if (!lPermissions.contains(f)) lPermissions.add(f);
                             }
                         }
 
-                        request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                        final StringBuilder fPermissions = new StringBuilder();
+                        for (final String s : lPermissions) {
+                            fPermissions.append(s).append("#");
+                        }
+
+                        final StringBuilder fInheritances = new StringBuilder();
+                        for (final String s : group.getInheritances()) {
+                            fInheritances.append(s).append("#");
+                        }
+
+                        request.answer(GroupCalls.CALLBACK_FULL_GROUP.name(), group.getName(), fPermissions.toString(), fInheritances.toString());
+                        break;
+                    case REQUEST_GROUP_EXISTS:
+                        if (this.provider.groups.containsKey(request.getData()[1])) {
+                            request.answer(GroupCalls.CALLBACK_NULL.name(), "null");
+                        } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
                         break;
                     case REQUEST_CREATE_GROUP:
                         if (!this.provider.groups.containsKey(request.getData()[1])) {
