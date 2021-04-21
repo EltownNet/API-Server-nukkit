@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
+import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
 
 import java.nio.charset.StandardCharsets;
@@ -30,6 +31,7 @@ public class Server {
 
     private EconomyHandler economyHandler;
     private PlayerHandler playerHandler;
+    private GroupHandler groupHandler;
 
     @SneakyThrows
     public void start() {
@@ -60,6 +62,10 @@ public class Server {
         this.log("Starte PlayerHandler...");
         this.playerHandler = new PlayerHandler(this, this.connection);
         this.log("PlayerHandler erfolgreich gestartet.");
+
+        this.log("Starte GroupHandler...");
+        this.groupHandler = new GroupHandler(this);
+        this.log("GroupHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
