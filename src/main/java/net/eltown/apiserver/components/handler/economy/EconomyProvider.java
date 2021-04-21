@@ -7,10 +7,8 @@ import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
 import org.bson.Document;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public class EconomyProvider {
 
@@ -50,6 +48,12 @@ public class EconomyProvider {
         CompletableFuture.runAsync(() -> {
             this.collection.updateOne(new Document("_id", id), new Document("$set", new Document("money", money)));
         });
+    }
+
+    public List<String> getAll() {
+        final List<String> list = new ArrayList<>();
+        players.forEach((user, money) -> list.add(user + ":" + money));
+        return list;
     }
 
 }

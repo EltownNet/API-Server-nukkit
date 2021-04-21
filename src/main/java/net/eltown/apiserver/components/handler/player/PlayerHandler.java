@@ -28,8 +28,6 @@ public class PlayerHandler {
             this.listener.receive((delivery -> {
                 final String[] request = delivery.getData();
 
-                System.out.println("got: " + delivery.getKey());
-
                 switch (PlayerCalls.valueOf(delivery.getKey())) {
                     case REQUEST_SETSYNC:
                         SyncPlayer set = new SyncPlayer(
