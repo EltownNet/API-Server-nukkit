@@ -3,10 +3,12 @@ package net.eltown.apiserver.components.handler.groupmanager;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.groupmanager.data.Group;
+import net.eltown.apiserver.components.handler.groupmanager.data.GroupedPlayer;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class GroupHandler {
 
@@ -50,12 +52,28 @@ public class GroupHandler {
                             } else request.answer(GroupCalls.CALLBACK_GROUP_PERMISSION_ALREADY_ADDED.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
                         break;
+                    case REQUEST_ADD_INHERITANCE:
+                        if (this.provider.groups.containsKey(request.getData()[1])) {
+                            if (!this.provider.groups.get(request.getData()[1]).getInheritances().contains(request.getData()[2])) {
+                                this.provider.addInheritance(request.getData()[1], request.getData()[2]);
+                                request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                            } else request.answer(GroupCalls.CALLBACK_GROUP_INHERITANCE_ALREADY_ADDED.name(), "null");
+                        } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
+                        break;
                     case REQUEST_REMOVE_PERMISSION:
                         if (this.provider.groups.containsKey(request.getData()[1])) {
                             if (this.provider.groups.get(request.getData()[1]).getPermissions().contains(request.getData()[2])) {
                                 this.provider.removePermission(request.getData()[1], request.getData()[2]);
                                 request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
                             } else request.answer(GroupCalls.CALLBACK_GROUP_PERMISSION_NOT_ADDED.name(), "null");
+                        } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
+                        break;
+                    case REQUEST_REMOVE_INHERITANCE:
+                        if (this.provider.groups.containsKey(request.getData()[1])) {
+                            if (this.provider.groups.get(request.getData()[1]).getInheritances().contains(request.getData()[2])) {
+                                this.provider.removeInheritance(request.getData()[1], request.getData()[2]);
+                                request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                            } else request.answer(GroupCalls.CALLBACK_GROUP_INHERITANCE_NOT_ADDED.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
                         break;
                     case REQUEST_FULL_GROUP:
@@ -81,6 +99,34 @@ public class GroupHandler {
 
                         request.answer(GroupCalls.CALLBACK_FULL_GROUP.name(), group.getName(), fPermissions.toString(), fInheritances.toString());
                         break;
+                    case REQUEST_FULL_GROUP_PLAYER:
+                        try {
+                            final GroupedPlayer player = this.provider.groupedPlayers.get(request.getData()[1]);
+                            final Group group2 = this.provider.groups.get(player.getGroup());
+                            final List<String> lPermissions2 = new ArrayList<>(group2.getPermissions());
+
+                            for (final String s : group2.getInheritances()) {
+                                final Group iGroup = this.provider.groups.get(s);
+                                for (final String f : iGroup.getPermissions()) {
+                                    if (!lPermissions2.contains(f)) lPermissions2.add(f);
+                                }
+                            }
+
+                            final StringBuilder fPermissions2 = new StringBuilder();
+                            for (final String s : lPermissions2) {
+                                fPermissions2.append(s).append("#");
+                            }
+
+                            final StringBuilder fInheritances2 = new StringBuilder();
+                            for (final String s : group2.getInheritances()) {
+                                fInheritances2.append(s).append("#");
+                            }
+
+                            request.answer(GroupCalls.CALLBACK_FULL_GROUP_PLAYER.name(), group2.getName(), fPermissions2.toString(), fInheritances2.toString());
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
                     case REQUEST_GROUP_EXISTS:
                         if (this.provider.groups.containsKey(request.getData()[1])) {
                             request.answer(GroupCalls.CALLBACK_NULL.name(), "null");
@@ -97,6 +143,15 @@ public class GroupHandler {
                             this.provider.removeGroup(request.getData()[1]);
                             request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
+                        break;
+                    case REQUEST_GROUPS:
+                        final StringBuilder builder = new StringBuilder();
+
+                        for (final String s : this.provider.groups.keySet()) {
+                            builder.append(s).append("#");
+                        }
+
+                        request.answer(GroupCalls.CALLBACK_GROUPS.name(), builder.toString());
                         break;
                 }
             }), "API/GroupManager", "groups");

@@ -105,7 +105,7 @@ public class GroupProvider {
             assert document != null;
             final List<String> list = document.getList("permissions", String.class);
             list.add(permission);
-            this.playerCollection.updateOne(document, new Document("$set", new Document("permissions", list)));
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("permissions", list)));
         });
     }
 
@@ -117,7 +117,31 @@ public class GroupProvider {
             assert document != null;
             final List<String> list = document.getList("permissions", String.class);
             list.remove(permission);
-            this.playerCollection.updateOne(document, new Document("$set", new Document("permissions", list)));
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("permissions", list)));
+        });
+    }
+
+    public void addInheritance(final String group, final String inheritance) {
+        final Group sGroup = this.groups.get(group);
+        sGroup.getInheritances().add(inheritance);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.groupCollection.find(new Document("group", group)).first();
+            assert document != null;
+            final List<String> list = document.getList("inheritances", String.class);
+            list.add(inheritance);
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("inheritances", list)));
+        });
+    }
+
+    public void removeInheritance(final String group, final String inheritance) {
+        final Group sGroup = this.groups.get(group);
+        sGroup.getInheritances().remove(inheritance);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.groupCollection.find(new Document("group", group)).first();
+            assert document != null;
+            final List<String> list = document.getList("inheritances", String.class);
+            list.remove(inheritance);
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("inheritances", list)));
         });
     }
 
