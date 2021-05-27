@@ -8,7 +8,6 @@ import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class GroupHandler {
 
@@ -40,6 +39,7 @@ public class GroupHandler {
                                 if (!this.provider.isInGroup(request.getData()[1], request.getData()[2])) {
                                     this.provider.setGroup(request.getData()[1], request.getData()[2], Long.parseLong(request.getData()[4]));
                                     request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                                    this.provider.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PLAYER_PREFIX.name(), request.getData()[1], request.getData()[2]);
                                 } else request.answer(GroupCalls.CALLBACK_PLAYER_ALREADY_IN_GROUP.name(), "null");
                             } else request.answer(GroupCalls.CALLBACK_PLAYER_DOES_NOT_EXIST.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
@@ -97,12 +97,14 @@ public class GroupHandler {
                             fInheritances.append(s).append("#");
                         }
 
-                        request.answer(GroupCalls.CALLBACK_FULL_GROUP.name(), group.getName(), fPermissions.toString(), fInheritances.toString());
+                        request.answer(GroupCalls.CALLBACK_FULL_GROUP.name(), group.getName(), group.getPrefix(), fPermissions.toString(), fInheritances.toString());
                         break;
                     case REQUEST_FULL_GROUP_PLAYER:
                         try {
                             final GroupedPlayer player = this.provider.groupedPlayers.get(request.getData()[1]);
+                            this.server.log(player.getGroup());
                             final Group group2 = this.provider.groups.get(player.getGroup());
+                            this.server.log(group2.getName());
                             final List<String> lPermissions2 = new ArrayList<>(group2.getPermissions());
 
                             for (final String s : group2.getInheritances()) {
@@ -122,7 +124,7 @@ public class GroupHandler {
                                 fInheritances2.append(s).append("#");
                             }
 
-                            request.answer(GroupCalls.CALLBACK_FULL_GROUP_PLAYER.name(), group2.getName(), fPermissions2.toString(), fInheritances2.toString());
+                            request.answer(GroupCalls.CALLBACK_FULL_GROUP_PLAYER.name(), group2.getName(), group2.getPrefix(), fPermissions2.toString(), fInheritances2.toString());
                         } catch (final Exception e) {
                             e.printStackTrace();
                         }
@@ -134,7 +136,7 @@ public class GroupHandler {
                         break;
                     case REQUEST_CREATE_GROUP:
                         if (!this.provider.groups.containsKey(request.getData()[1])) {
-                            this.provider.createGroup(request.getData()[1]);
+                            this.provider.createGroup(request.getData()[1], request.getData()[2]);
                             request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_ALREADY_EXIST.name(), "null");
                         break;
