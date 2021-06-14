@@ -3,6 +3,7 @@ package net.eltown.apiserver.components.handler.teleportation;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.teleportation.data.Home;
+import net.eltown.apiserver.components.handler.teleportation.data.Warp;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 import java.util.LinkedList;
@@ -45,6 +46,51 @@ public class TeleportationHandler {
                             request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
                         } else request.answer(TeleportationCalls.CALLBACK_HOME_ALREADY_SET.name(), "null");
                         break;
+                    case REQUEST_DELETE_HOME:
+                        this.provider.deleteHome(request.getData()[1], request.getData()[2]);
+                        break;
+                    case REQUEST_RENAME_HOME:
+                        this.provider.updateHomeName(request.getData()[1], request.getData()[2], request.getData()[3]);
+                        break;
+                    case REQUEST_UPDATE_POSITION:
+                        this.provider.updateHomePosition(request.getData()[1], request.getData()[2], request.getData()[3], request.getData()[4], Double.parseDouble(request.getData()[5]),
+                                Double.parseDouble(request.getData()[6]), Double.parseDouble(request.getData()[7]), Double.parseDouble(request.getData()[8]), Double.parseDouble(request.getData()[9]));
+                        break;
+                    case REQUEST_DELETE_ALL_SERVER_HOMES:
+                        this.provider.deleteServerHomes(request.getData()[1]);
+                        break;
+                    case REQUEST_ALL_WARPS:
+                        final Set<Warp> warps = this.provider.getWarps();
+                        if (warps.size() == 0) {
+                            request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+                        } else {
+                            final LinkedList<String> list = new LinkedList<>();
+                            for (final Warp warp : warps) {
+                                list.add(warp.getName() + ">>" + warp.getDisplayName() + ">>" + warp.getImageUrl() + ">>" + warp.getServer() + ">>" + warp.getWorld() + ">>" + warp.getX() + ">>" + warp.getY() + ">>" + warp.getZ() + ">>" + warp.getYaw() + ">>" + warp.getPitch());
+                            }
+                            request.answer(TeleportationCalls.CALLBACK_ALL_WARPS.name(), list.toArray(new String[0]));
+                        }
+                        break;
+                    case REQUEST_ADD_WARP:
+                        if (!this.provider.warpExists(request.getData()[1])) {
+                            this.provider.createWarp(request.getData()[1], request.getData()[2], request.getData()[3], request.getData()[4], request.getData()[5], Double.parseDouble(request.getData()[6]),
+                                    Double.parseDouble(request.getData()[7]), Double.parseDouble(request.getData()[8]), Double.parseDouble(request.getData()[9]), Double.parseDouble(request.getData()[10]));
+                            request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+                        } else request.answer(TeleportationCalls.CALLBACK_WARP_ALREADY_SET.name(), "null");
+                        break;
+                    case REQUEST_DELETE_WARP:
+                        this.provider.deleteWarp(request.getData()[1]);
+                        break;
+                    case REQUEST_RENAME_WARP:
+                        this.provider.updateWarpName(request.getData()[1], request.getData()[2]);
+                        break;
+                    case REQUEST_UPDATE_WARP_IMAGE:
+                        this.provider.updateWarpImage(request.getData()[1], request.getData()[2]);
+                        break;
+                    case REQUEST_UPDATE_WARP_POSITION:
+                        this.provider.updateWarpPosition(request.getData()[1], request.getData()[2], request.getData()[3], Double.parseDouble(request.getData()[4]),
+                                Double.parseDouble(request.getData()[5]), Double.parseDouble(request.getData()[6]), Double.parseDouble(request.getData()[7]), Double.parseDouble(request.getData()[8]));
+                        break;
                     case REQUEST_TELEPORT:
                         final String[] d = request.getData();
                         this.provider.cachedTeleportation.put(d[2], new Home(d[1], d[2], d[3], d[4], Double.parseDouble(d[5]), Double.parseDouble(d[6]), Double.parseDouble(d[7]), Double.parseDouble(d[8]), Double.parseDouble(d[9])));
@@ -58,23 +104,6 @@ public class TeleportationHandler {
                             request.answer(TeleportationCalls.CALLBACK_CACHED_DATA.name(), home.getName(), home.getWorld(), String.valueOf(home.getX()), String.valueOf(home.getY()), String.valueOf(home.getZ()),
                                     String.valueOf(home.getYaw()), String.valueOf(home.getPitch()));
                         } else request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
-                        break;
-                    case REQUEST_DELETE_HOME:
-                        this.provider.deleteHome(request.getData()[1], request.getData()[2]);
-                        request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
-                        break;
-                    case REQUEST_RENAME_HOME:
-                        this.provider.updateName(request.getData()[1], request.getData()[2], request.getData()[3]);
-                        request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
-                        break;
-                    case REQUEST_UPDATE_POSITION:
-                        this.provider.updatePosition(request.getData()[1], request.getData()[2], request.getData()[3], request.getData()[4], Double.parseDouble(request.getData()[5]),
-                                Double.parseDouble(request.getData()[6]), Double.parseDouble(request.getData()[7]), Double.parseDouble(request.getData()[8]), Double.parseDouble(request.getData()[9]));
-                        request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
-                        break;
-                    case REQUEST_DELETE_ALL_SERVER_HOMES:
-                        this.provider.deleteServerHomes(request.getData()[1]);
-                        request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }
             }), "API/Teleportation", "teleportation");
