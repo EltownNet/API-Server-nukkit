@@ -207,8 +207,4 @@ public class TeleportationProvider {
         warp.setPitch(pitch);
     }
 
-    public Set<Warp> getWarps() {
-        return (Set<Warp>) this.warps.values();
-    }
-
 }
