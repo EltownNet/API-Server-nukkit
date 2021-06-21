@@ -11,10 +11,9 @@ import net.eltown.apiserver.components.handler.teleportation.data.Warp;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TeleportationProvider {
 
@@ -24,6 +23,7 @@ public class TeleportationProvider {
 
     public final HashMap<String, Home> homes = new HashMap<>();
     public final HashMap<String, Warp> warps = new HashMap<>();
+    public final HashMap<String, List<String>> tpas = new HashMap<>();
 
     public final HashMap<String, Home> cachedTeleportation = new HashMap<>();
 
@@ -205,6 +205,47 @@ public class TeleportationProvider {
         warp.setZ(z);
         warp.setYaw(yaw);
         warp.setPitch(pitch);
+    }
+
+    public void createTpa(final String player, final String target) {
+        this.tpas.computeIfAbsent(target, k -> new ArrayList<>());
+        this.tpas.get(target).add(player + ":" + System.currentTimeMillis() + 120000);
+    }
+
+    public Set<String> getTpas(final String target) {
+        final Set<String> set = new HashSet<>();
+        if (this.tpas.get(target) == null) return set;
+
+        this.tpas.get(target).forEach(e -> {
+            if (Long.parseLong(e.split(":")[1]) < System.currentTimeMillis()) {
+                this.removeTpa(target, e.split(":")[0]);
+            } else set.add(e.split(":")[0]);
+        });
+        return set;
+    }
+
+    public boolean hasTpaSent(final String target, final String player) {
+        final AtomicBoolean aBoolean = new AtomicBoolean(false);
+        this.tpas.computeIfAbsent(target, k -> new ArrayList<>());
+
+        this.tpas.get(target).forEach(e -> {
+            if (e.startsWith(player)) {
+                final long time = Long.parseLong(e.split(":")[1]);
+                if (System.currentTimeMillis() > time) {
+                    this.removeTpa(target, player);
+                    aBoolean.set(false);
+                } else aBoolean.set(true);
+            }
+        });
+        return aBoolean.get();
+    }
+
+    public void removeTpa(final String target, final String player) {
+        this.tpas.get(target).forEach(e -> {
+            if (e.startsWith(player)) {
+                this.tpas.get(target).remove(e);
+            }
+        });
     }
 
 }

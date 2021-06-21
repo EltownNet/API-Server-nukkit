@@ -60,12 +60,19 @@ public class TeleportationHandler {
 
                         this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TELEPORT.name(), d[2], d[3]);
                         break;
+                    case REQUEST_ACCEPT_TPA:
+                        this.provider.removeTpa(delivery.getData()[1], delivery.getData()[2]);
+
+                        this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TELEPORT_TPA.name(), delivery.getData()[1], delivery.getData()[2]);
+                        break;
+                    case REQUEST_DENY_TPA:
+                        this.provider.removeTpa(delivery.getData()[1], delivery.getData()[2]);
+                        break;
                 }
             }, "API/Teleportation/Receive", "teleportation.receive");
         });
         this.server.getExecutor().execute(() -> {
             this.tinyRabbitListener.callback((request -> {
-                this.server.log(request.getKey());
                 switch (TeleportationCalls.valueOf(request.getKey().toUpperCase())) {
                     case REQUEST_ALL_HOMES:
                         final Set<Home> homes = this.provider.getHomes(request.getData()[1]);
@@ -87,21 +94,15 @@ public class TeleportationHandler {
                         } else request.answer(TeleportationCalls.CALLBACK_HOME_ALREADY_SET.name(), "null");
                         break;
                     case REQUEST_ALL_WARPS:
-                        try {
-                            this.server.log(request.getKey());
-                            final Collection<Warp> warps = this.provider.warps.values();
-                            if (warps.size() == 0) {
-                                request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
-                            } else {
-                                final LinkedList<String> list = new LinkedList<>();
-                                for (final Warp warp : warps) {
-                                    list.add(warp.getName() + ">>" + warp.getDisplayName() + ">>" + warp.getImageUrl() + ">>" + warp.getServer() + ">>" + warp.getWorld() + ">>" + warp.getX() + ">>" + warp.getY() + ">>" + warp.getZ() + ">>" + warp.getYaw() + ">>" + warp.getPitch());
-                                }
-                                request.answer(TeleportationCalls.CALLBACK_ALL_WARPS.name(), list.toArray(new String[0]));
-                                this.server.log(String.join(",", list));
+                        final Collection<Warp> warps = this.provider.warps.values();
+                        if (warps.size() == 0) {
+                            request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+                        } else {
+                            final LinkedList<String> list = new LinkedList<>();
+                            for (final Warp warp : warps) {
+                                list.add(warp.getName() + ">>" + warp.getDisplayName() + ">>" + warp.getImageUrl() + ">>" + warp.getServer() + ">>" + warp.getWorld() + ">>" + warp.getX() + ">>" + warp.getY() + ">>" + warp.getZ() + ">>" + warp.getYaw() + ">>" + warp.getPitch());
                             }
-                        } catch (final Exception e) {
-                            e.printStackTrace();
+                            request.answer(TeleportationCalls.CALLBACK_ALL_WARPS.name(), list.toArray(new String[0]));
                         }
                         break;
                     case REQUEST_ADD_WARP:
@@ -118,6 +119,30 @@ public class TeleportationHandler {
                             request.answer(TeleportationCalls.CALLBACK_CACHED_DATA.name(), home.getName(), home.getWorld(), String.valueOf(home.getX()), String.valueOf(home.getY()), String.valueOf(home.getZ()),
                                     String.valueOf(home.getYaw()), String.valueOf(home.getPitch()));
                         } else request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+                        break;
+                    case REQUEST_SEND_TPA:
+                        try {
+                            if (!this.provider.hasTpaSent(request.getData()[2], request.getData()[1])) {
+                                this.provider.createTpa(request.getData()[1], request.getData()[2]);
+                                request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+
+                                this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TPA_NOTIFICATION.name(), request.getData()[1], request.getData()[2]);
+                            } else request.answer(TeleportationCalls.CALLBACK_TPA_ALREADY_SENT.name(), "null");
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case REQUEST_TPAS:
+                        try {
+                            final Collection<String> tpas = this.provider.getTpas(request.getData()[1]);
+                            if (tpas.size() == 0) {
+                                request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
+                            } else {
+                                request.answer(TeleportationCalls.CALLBACK_TPAS.name(), tpas.toArray(new String[0]));
+                            }
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
             }), "API/Teleportation/Callback", "teleportation.callback");
