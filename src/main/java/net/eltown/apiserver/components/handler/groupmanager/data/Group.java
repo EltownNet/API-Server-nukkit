@@ -8,6 +8,7 @@ import java.util.List;
 public class Group {
 
     private final String name;
+    private final String prefix;
     private final List<String> permissions;
     private final List<String> inheritances;
 

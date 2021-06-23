@@ -3,10 +3,13 @@ package net.eltown.apiserver.components.handler.groupmanager;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.handler.groupmanager.data.Group;
 import net.eltown.apiserver.components.handler.groupmanager.data.GroupedPlayer;
+import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -14,24 +17,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Getter
 public class GroupProvider {
 
     private final MongoClient client;
     private final MongoCollection<Document> groupCollection, playerCollection;
+    private final TinyRabbit tinyRabbit;
 
     public final HashMap<String, Group> groups = new HashMap<>();
     public final HashMap<String, GroupedPlayer> groupedPlayers = new HashMap<>();
 
+    @SneakyThrows
     public GroupProvider(final Server server) {
         final Config config = server.getConfig();
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
         this.groupCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("group_groups");
         this.playerCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("group_players");
 
+        this.tinyRabbit = new TinyRabbit("localhost", "API/GroupManager/Message");
+
         server.log("Gruppen werden in den Cache geladen...");
         for (final Document document : this.groupCollection.find()) {
             this.groups.put(document.getString("group"), new Group(
                     document.getString("group"),
+                    document.getString("prefix"),
                     document.getList("permissions", String.class),
                     document.getList("inheritances", String.class)
             ));
@@ -49,7 +58,7 @@ public class GroupProvider {
         server.log(this.groupedPlayers.size() + " Spieler wurden in den Cache geladen...");
 
         if (this.groups.get("SPIELER") == null) {
-            this.createGroup("SPIELER");
+            this.createGroup("SPIELER", "§7Spieler §8| §7%p");
         }
     }
 
@@ -78,10 +87,10 @@ public class GroupProvider {
         });
     }
 
-    public void createGroup(final String group) {
-        this.groups.put(group, new Group(group, new ArrayList<String>(), new ArrayList<String>()));
+    public void createGroup(final String group, final String prefix) {
+        this.groups.put(group, new Group(group, prefix, new ArrayList<String>(), new ArrayList<String>()));
         CompletableFuture.runAsync(() -> {
-            this.groupCollection.insertOne(new Document("group", group.toUpperCase()).append("permissions", new ArrayList<String>()).append("inheritances", new ArrayList<String>()));
+            this.groupCollection.insertOne(new Document("group", group.toUpperCase()).append("prefix", prefix).append("permissions", new ArrayList<String>()).append("inheritances", new ArrayList<String>()));
         });
     }
 
@@ -105,7 +114,7 @@ public class GroupProvider {
             assert document != null;
             final List<String> list = document.getList("permissions", String.class);
             list.add(permission);
-            this.playerCollection.updateOne(document, new Document("$set", new Document("permissions", list)));
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("permissions", list)));
         });
     }
 
@@ -117,7 +126,31 @@ public class GroupProvider {
             assert document != null;
             final List<String> list = document.getList("permissions", String.class);
             list.remove(permission);
-            this.playerCollection.updateOne(document, new Document("$set", new Document("permissions", list)));
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("permissions", list)));
+        });
+    }
+
+    public void addInheritance(final String group, final String inheritance) {
+        final Group sGroup = this.groups.get(group);
+        sGroup.getInheritances().add(inheritance);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.groupCollection.find(new Document("group", group)).first();
+            assert document != null;
+            final List<String> list = document.getList("inheritances", String.class);
+            list.add(inheritance);
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("inheritances", list)));
+        });
+    }
+
+    public void removeInheritance(final String group, final String inheritance) {
+        final Group sGroup = this.groups.get(group);
+        sGroup.getInheritances().remove(inheritance);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.groupCollection.find(new Document("group", group)).first();
+            assert document != null;
+            final List<String> list = document.getList("inheritances", String.class);
+            list.remove(inheritance);
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("inheritances", list)));
         });
     }
 
