@@ -44,16 +44,17 @@ public class Server {
         config.reload();
         config.save();
         if (!config.exists("MongoDB")) {
-            config.set("MongoDB.Uri", "ENTER");
+            config.set("MongoDB.Uri", "mongodb://root:e67bLwYNdv45g6smn3H9p32JzfsdgzYt6hNnYK323wdL@45.138.50.23:27017/admin?authSource=admin");
             config.set("MongoDB.PlayerDB", "eltown");
+            config.set("MongoDB.EconomyDB", "eltown");
+            config.set("MongoDB.GroupDB", "eltown");
+            config.set("MongoDB.CryptoDB", "eltown");
         }
         config.save();
 
         this.log("Verbinde zu RabbitMQ...");
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        factory.setUsername("api");
-        factory.setPassword(" ");
         this.connection = factory.newConnection("API Server");
         this.log("Erfolgreich mit RabbitMQ verbunden.");
 

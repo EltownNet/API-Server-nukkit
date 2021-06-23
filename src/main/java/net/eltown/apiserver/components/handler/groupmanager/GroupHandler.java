@@ -101,10 +101,12 @@ public class GroupHandler {
                         break;
                     case REQUEST_FULL_GROUP_PLAYER:
                         try {
+                            if (!this.provider.playerExists(request.getData()[1])) {
+                                this.provider.createPlayer(request.getData()[1]);
+                            }
+
                             final GroupedPlayer player = this.provider.groupedPlayers.get(request.getData()[1]);
-                            this.server.log(player.getGroup());
                             final Group group2 = this.provider.groups.get(player.getGroup());
-                            this.server.log(group2.getName());
                             final List<String> lPermissions2 = new ArrayList<>(group2.getPermissions());
 
                             for (final String s : group2.getInheritances()) {
