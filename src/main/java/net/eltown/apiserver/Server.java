@@ -44,6 +44,7 @@ public class Server {
         if (!config.exists("MongoDB")) {
             config.set("MongoDB.Uri", "ENTER");
             config.set("MongoDB.PlayerDB", "eltown");
+            config.set("MongoDB.CryptoDB", "crypto");
         }
         config.save();
 
