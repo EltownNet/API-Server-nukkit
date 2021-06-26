@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
+import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
@@ -34,6 +35,7 @@ public class Server {
     private PlayerHandler playerHandler;
     private GroupHandler groupHandler;
     private TeleportationHandler teleportationHandler;
+    private CryptoHandler cryptoHandler;
 
     @SneakyThrows
     public void start() {
@@ -44,7 +46,7 @@ public class Server {
         config.reload();
         config.save();
         if (!config.exists("MongoDB")) {
-            config.set("MongoDB.Uri", "mongodb://root:e67bLwYNdv45g6smn3H9p32JzfsdgzYt6hNnYK323wdL@45.138.50.23:27017/admin?authSource=admin");
+            config.set("MongoDB.Uri", "mongodb://root:Qco7TDqoYq3RXq4pA3y7ETQTK6AgqzmTtRGLsgbN@45.138.50.23:27017/admin?authSource=admin");
             config.set("MongoDB.PlayerDB", "eltown");
             config.set("MongoDB.CryptoDB", "crypto");
             config.set("MongoDB.EconomyDB", "eltown");
@@ -62,6 +64,10 @@ public class Server {
         this.log("Starte EconomyHandler...");
         this.economyHandler = new EconomyHandler(this, this.connection);
         this.log("EcomomyHandler erfolgreich gestartet.");
+
+        this.log("Starte CryptoHandler...");
+        this.cryptoHandler = new CryptoHandler(this);
+        this.log("CryptoHandler erfolgreich gestartet.");
 
         this.log("Starte PlayerHandler...");
         this.playerHandler = new PlayerHandler(this, this.connection);
