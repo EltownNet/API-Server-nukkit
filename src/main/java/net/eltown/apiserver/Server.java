@@ -11,6 +11,7 @@ import net.eltown.apiserver.components.handler.economy.EconomyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
 import net.eltown.apiserver.components.handler.teleportation.TeleportationHandler;
+import net.eltown.apiserver.components.handler.ticketsystem.TicketHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,6 +36,7 @@ public class Server {
     private PlayerHandler playerHandler;
     private GroupHandler groupHandler;
     private TeleportationHandler teleportationHandler;
+    private TicketHandler ticketHandler;
     private CryptoHandler cryptoHandler;
 
     @SneakyThrows
@@ -80,6 +82,10 @@ public class Server {
         this.log("Starte TeleportationHandler...");
         this.teleportationHandler = new TeleportationHandler(this);
         this.log("TeleportationHandler erfolgreich gestartet.");
+
+        this.log("Starte TicketHandler...");
+        this.ticketHandler = new TicketHandler(this);
+        this.log("TicketHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
