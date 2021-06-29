@@ -15,6 +15,7 @@ public class TinyRabbitListener {
     public TinyRabbitListener(final String host) {
         this.factory = new ConnectionFactory();
         factory.setHost(host);
+        factory.setAutomaticRecoveryEnabled(true);
     }
 
     public void throwExceptions(final boolean value) {
@@ -36,7 +37,14 @@ public class TinyRabbitListener {
                 }
             };
 
-            channel.addShutdownListener(Throwable::printStackTrace);
+            if (this.throwExceptions) {
+                channel.addShutdownListener(e -> {
+                    e.printStackTrace();
+                    System.out.println("Warnung: Ein TinyRabbitListener Receive Channel wurde aufgrund eines Fehlers geschlossen.");
+                    System.out.println("Der Channel wird neugestartet.");
+                    this.receive(received, connectionName, queue);
+                });
+            }
 
             channel.basicConsume(queue, true, deliverCallback, consumerTag -> { });
         } catch (final Exception ex) {
@@ -64,7 +72,14 @@ public class TinyRabbitListener {
                 }
             };
 
-            channel.addShutdownListener(Throwable::printStackTrace);
+            if (this.throwExceptions) {
+                channel.addShutdownListener(e -> {
+                    e.printStackTrace();
+                    System.out.println("Warnung: Ein TinyRabbitListener Callback Channel wurde aufgrund eines Fehlers geschlossen.");
+                    System.out.println("Der Channel wird neugestartet.");
+                    this.callback(request, connectionName, queue);
+                });
+            }
 
             channel.basicConsume(queue, false, callback, (consumerTag -> {
             }));

@@ -19,6 +19,7 @@ public class GroupHandler {
     public GroupHandler(final Server server) {
         this.server = server;
         this.tinyRabbitListener = new TinyRabbitListener("localhost");
+        this.tinyRabbitListener.throwExceptions(true);
         this.provider = new GroupProvider(server);
         this.startCallbacking();
     }

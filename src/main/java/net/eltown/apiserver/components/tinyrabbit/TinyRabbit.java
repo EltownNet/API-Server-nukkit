@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class TinyRabbit {
 
     private Connection connection;
-    private final Channel channel;
+    private Channel channel;
     private final String host, connectionName;
     private boolean throwExceptions = false;
 
@@ -25,9 +25,23 @@ public class TinyRabbit {
 
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
+        factory.setAutomaticRecoveryEnabled(true);
         this.connection = factory.newConnection(connectionName);
 
         this.channel = connection.createChannel();
+
+        if (throwExceptions) {
+            this.channel.addShutdownListener((e) -> {
+                try {
+                    e.printStackTrace();
+                    System.out.println("Warnung: Ein TinyRabbit Channel wurde aufgrund eines Fehlers geschlossen.");
+                    System.out.println("Der Channel wird neugestartet.");
+                    this.channel = connection.createChannel();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
     }
 
     public void throwExceptions(final boolean value) {

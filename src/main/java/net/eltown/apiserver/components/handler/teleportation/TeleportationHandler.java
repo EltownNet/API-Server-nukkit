@@ -20,6 +20,7 @@ public class TeleportationHandler {
     public TeleportationHandler(final Server server) {
         this.server = server;
         this.tinyRabbitListener = new TinyRabbitListener("localhost");
+        this.tinyRabbitListener.throwExceptions(true);
         this.provider = new TeleportationProvider(server);
         this.startCallbacking();
     }
