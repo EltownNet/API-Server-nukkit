@@ -36,6 +36,8 @@ public class TinyRabbitListener {
                 }
             };
 
+            channel.addShutdownListener(Throwable::printStackTrace);
+
             channel.basicConsume(queue, true, deliverCallback, consumerTag -> { });
         } catch (final Exception ex) {
             if (this.throwExceptions) ex.printStackTrace();
@@ -61,6 +63,8 @@ public class TinyRabbitListener {
                     if (this.throwExceptions) ex.printStackTrace();
                 }
             };
+
+            channel.addShutdownListener(Throwable::printStackTrace);
 
             channel.basicConsume(queue, false, callback, (consumerTag -> {
             }));
