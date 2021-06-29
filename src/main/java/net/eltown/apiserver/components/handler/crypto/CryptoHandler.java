@@ -26,6 +26,7 @@ public class CryptoHandler {
         this.server = server;
         this.provider = new CryptoProvider(server);
         this.listener = new TinyRabbitListener("localhost");
+        this.listener.throwExceptions(true);
         this.startCallbacking();
     }
 
@@ -80,7 +81,7 @@ public class CryptoHandler {
                                         .append("&");
                             });
 
-                            request.answer(CryptoCalls.REQUEST_TRANSACTIONS.name(), sb.length() > 3  ? sb.substring(0, sb.length() - 1) : "null");
+                            request.answer(CryptoCalls.REQUEST_TRANSACTIONS.name(), sb.length() > 3 ? sb.substring(0, sb.length() - 1) : "null");
                             break;
                     }
                 } catch (Exception ex) {
@@ -89,84 +90,45 @@ public class CryptoHandler {
             }, "API/Crypto", "crypto.callback");
         });
 
-        /*
-        * ```yaml
-_id: "asjfkjnbn34234n45"
-amount: 3
-worth: 39.99
-type: "CTC/ELT/NOT"
-to: "JanIstSüß"
-from: "Justin"
-minutesLeft: 30
-completed: true
-```*/
-
         this.server.getExecutor().execute(() -> {
-            this.listener.receive((delivery) -> {
-                try {
-                    final String[] data = delivery.getData();
+                this.listener.receive((delivery) -> {
+                        final String[] data = delivery.getData();
 
-                    switch (CryptoCalls.valueOf(delivery.getKey())) {
-                        case UPDATE_WALLET:
-                            this.provider.updateWallet(new Wallet(
-                                    data[1],
-                                    Double.parseDouble(data[2]),
-                                    Double.parseDouble(data[3]),
-                                    Double.parseDouble(data[4])
-                            ));
-                            break;
-                        case UPDATE_TRANSFER_CRYPTO:
-                            final String id = this.createID(10);
-                            final String asset = data[1];
-                            final double amount = Double.parseDouble(data[2]);
-                            final double worth = Double.parseDouble(data[3]);
-                            final String from = data[4];
-                            final String to = data[5];
-                            final int time = Integer.parseInt(data[6]);
+                        switch (CryptoCalls.valueOf(delivery.getKey())) {
+                            case UPDATE_WALLET:
+                                this.provider.updateWallet(new Wallet(
+                                        data[1],
+                                        Double.parseDouble(data[2]),
+                                        Double.parseDouble(data[3]),
+                                        Double.parseDouble(data[4])
+                                ));
+                                break;
+                            case UPDATE_TRANSFER_CRYPTO:
+                                final String id = this.createID(32);
+                                final String asset = data[1];
+                                final double amount = Double.parseDouble(data[2]);
+                                final double worth = Double.parseDouble(data[3]);
+                                final String from = data[4];
+                                final String to = data[5];
+                                final int time = Integer.parseInt(data[6]);
 
-                            this.provider.addTransaction(new Transaction(id, amount, worth, asset, from, to, time, false));
-                            break;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }, "API/Crypto", "crypto.receive");
+                                this.provider.addTransaction(new Transaction(id, amount, worth, asset, from, to, time, false));
+                                break;
+                        }
+                }, "API/Crypto", "crypto.receive");
         });
+
     }
 
     private String createID(final int i) {
-        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        final String chars = "a1b72c3d48e5f6123491234567890567890";
         final StringBuilder stringBuilder = new StringBuilder();
         final Random rnd = new Random();
         while (stringBuilder.length() < i) {
             int index = (int) (rnd.nextFloat() * chars.length());
             stringBuilder.append(chars.charAt(index));
         }
-        return this.getMD5Hash(stringBuilder.toString());
+        return stringBuilder.toString();
     }
-
-    private String getMD5Hash(String data) {
-        String result = null;
-        try {
-            final MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
-            return bytesToHex(hash);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return result;
-    }
-
-    /**
-     * Use javax.xml.bind.DatatypeConverter class in JDK to convert byte array
-     * to a hexadecimal string. Note that this generates hexadecimal in upper case.
-     *
-     * @param hash
-     * @return
-     */
-    private String bytesToHex(byte[] hash) {
-        return DatatypeConverter.printHexBinary(hash);
-    }
-
 
 }
