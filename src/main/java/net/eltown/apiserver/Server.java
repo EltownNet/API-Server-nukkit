@@ -10,6 +10,7 @@ import net.eltown.apiserver.components.handler.economy.EconomyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
 import net.eltown.apiserver.components.handler.teleportation.TeleportationHandler;
+import net.eltown.apiserver.components.handler.ticketsystem.TicketHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ public class Server {
     private PlayerHandler playerHandler;
     private GroupHandler groupHandler;
     private TeleportationHandler teleportationHandler;
+    private TicketHandler ticketHandler;
 
     @SneakyThrows
     public void start() {
@@ -44,7 +46,7 @@ public class Server {
         config.reload();
         config.save();
         if (!config.exists("MongoDB")) {
-            config.set("MongoDB.Uri", "mongodb://root:e67bLwYNdv45g6smn3H9p32JzfsdgzYt6hNnYK323wdL@45.138.50.23:27017/admin?authSource=admin");
+            config.set("MongoDB.Uri", "mongodb://root:Qco7TDqoYq3RXq4pA3y7ETQTK6AgqzmTtRGLsgbN@45.138.50.23:27017/admin?authSource=admin");
             config.set("MongoDB.PlayerDB", "eltown");
             config.set("MongoDB.EconomyDB", "eltown");
             config.set("MongoDB.GroupDB", "eltown");
@@ -73,6 +75,10 @@ public class Server {
         this.log("Starte TeleportationHandler...");
         this.teleportationHandler = new TeleportationHandler(this);
         this.log("TeleportationHandler erfolgreich gestartet.");
+
+        this.log("Starte TicketHandler...");
+        this.ticketHandler = new TicketHandler(this);
+        this.log("TicketHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
