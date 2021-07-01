@@ -17,6 +17,7 @@ public class EconomyHandler {
         this.server = server;
         this.provider = new EconomyProvider(server);
         this.listener = new TinyRabbitListener("localhost");
+        this.listener.throwExceptions(true);
         this.startCallbacking();
     }
 

@@ -1,18 +1,13 @@
 package net.eltown.apiserver.components.handler.crypto;
 
-import com.rabbitmq.client.Connection;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.crypto.data.Transaction;
 import net.eltown.apiserver.components.handler.crypto.data.TransferPrices;
 import net.eltown.apiserver.components.handler.crypto.data.Wallet;
 import net.eltown.apiserver.components.handler.crypto.data.Worth;
-import net.eltown.apiserver.components.handler.economy.EconomyProvider;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Random;
 
 public class CryptoHandler {
