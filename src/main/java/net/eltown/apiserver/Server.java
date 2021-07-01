@@ -8,6 +8,7 @@ import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
 import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
+import net.eltown.apiserver.components.handler.giftkeys.GiftkeyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
 import net.eltown.apiserver.components.handler.teleportation.TeleportationHandler;
@@ -38,6 +39,7 @@ public class Server {
     private TeleportationHandler teleportationHandler;
     private TicketHandler ticketHandler;
     private CryptoHandler cryptoHandler;
+    private GiftkeyHandler giftkeyHandler;
 
     @SneakyThrows
     public void start() {
@@ -86,6 +88,10 @@ public class Server {
         this.log("Starte TicketHandler...");
         this.ticketHandler = new TicketHandler(this);
         this.log("TicketHandler erfolgreich gestartet.");
+
+        this.log("Starte GiftkeyHandler...");
+        this.giftkeyHandler = new GiftkeyHandler(this);
+        this.log("GiftkeyHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
