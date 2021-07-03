@@ -45,7 +45,7 @@ public class ShopTask {
                         server.log(count.get() + " Shop Preise wurde aktualisiert.");
                     }
                 },
-                TimeUnit.HOURS.toHours(1), TimeUnit.HOURS.toHours(1));
+                TimeUnit.HOURS.toMillis(1), TimeUnit.HOURS.toMillis(1));
 
         this.timer.schedule(
                 new TimerTask() {
@@ -60,10 +60,12 @@ public class ShopTask {
                             count.incrementAndGet();
                         });
 
+                        provider.getToUpdate().clear();
+
                         server.log(count.get() + " Shop Preise wurden gespeichert.");
                     }
                 },
-                TimeUnit.MINUTES.toMinutes(5), TimeUnit.MINUTES.toMinutes(5));
+                TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5));
     }
 
 }

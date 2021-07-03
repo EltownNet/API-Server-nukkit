@@ -3,6 +3,7 @@ package net.eltown.apiserver.components.handler.shops;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.UpdateOptions;
 import lombok.Getter;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
@@ -10,6 +11,7 @@ import net.eltown.apiserver.components.handler.player.data.SyncPlayer;
 import net.eltown.apiserver.components.handler.shops.data.ItemPrice;
 import org.bson.Document;
 
+import javax.swing.tree.ExpandVetoException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class ShopProvider {
         server.log("Shop Preise werden in den Cache geladen...");
         final Config config = server.getConfig();
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
-        this.collection = this.client.getDatabase(config.getString("MongoDB.ShopDB")).getCollection("prices");
+        this.collection = this.client.getDatabase(config.getString("MongoDB.ShopsDB")).getCollection("shop_prices");
 
         for (final Document e : this.collection.find()) {
             final String[] splitId = e.getString("_id").split(":");
@@ -46,7 +48,7 @@ public class ShopProvider {
     }
 
     public double getPrice(final int[] id) {
-        return this.prices.getOrDefault(this.stringId(id), this.createPrice(id)).getPrice();
+        return this.prices.containsKey(this.stringId(id)) ? this.prices.get(this.stringId(id)).getPrice() : this.createPrice(id).getPrice();
     }
 
     public void setPrice(final int[] id, final double price) {
@@ -56,26 +58,38 @@ public class ShopProvider {
     }
 
     public void addBought(final int[] id, final int amount) {
-        this.prices.get(this.stringId(id)).addBought(amount);
+        final ItemPrice price = this.prices.get(this.stringId(id));
+        price.addBought(amount);
+        this.getPrices().put(this.stringId(price.getId()), price);
         this.toUpdate.add(this.stringId(id));
     }
 
     public void addSold(final int[] id, final int amount) {
-        this.prices.get(this.stringId(id)).addSold(amount);
+        final ItemPrice price = this.prices.get(this.stringId(id));
+        price.addSold(amount);
+        this.getPrices().put(this.stringId(price.getId()), price);
         this.toUpdate.add(this.stringId(id));
     }
 
     public void updatePrice(final ItemPrice price) {
+        this.prices.put(this.stringId(price.getId()), price);
         CompletableFuture.runAsync(() -> {
-            this.collection.updateOne(new Document("_id", this.stringId(price.getId())),
-                    new Document("$set", new Document("price", price.getPrice())
-                            .append("bought", price.getBought())
-                            .append("sold", price.getSold()))
-            );
+            try {
+                this.collection.updateOne(new Document("_id", this.stringId(price.getId())),
+                        new Document("$set", new Document("price", price.getPrice())
+                                .append("bought", price.getBought())
+                                .append("sold", price.getSold()))
+                );
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
     }
 
     private ItemPrice createPrice(final int[] id) {
+        System.out.println("createPrice scheiß java");
+        final ItemPrice itemPrice = new ItemPrice(id, 5, 0, 0);
+        this.getPrices().put(stringId(id), itemPrice);
         CompletableFuture.runAsync(() -> {
             this.collection.insertOne(
                     new Document("_id", this.stringId(id))
@@ -85,7 +99,7 @@ public class ShopProvider {
             );
         });
 
-        return new ItemPrice(id, 5, 0, 0);
+        return itemPrice;
     }
 
     public String stringId(final int[] id) {
