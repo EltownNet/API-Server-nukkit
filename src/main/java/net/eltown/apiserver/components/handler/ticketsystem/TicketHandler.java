@@ -73,10 +73,8 @@ public class TicketHandler {
                                         builder.append(f).append("~~~");
                                     });
                                     final String messages = builder.substring(0, builder.length() - 3);
-                                    System.out.println(messages);
                                     list.add(e.getCreator() + ">>" + e.getSupporter() + ">>" + e.getId() + ">>" + e.getSubject() + ">>" + e.getSection()  + ">>" + e.getPriority() + ">>" + messages + ">>" + e.getDateOpened() + ">>" + e.getDateClosed());
                                 }
-                                System.out.println(Arrays.toString(list.toArray(new String[0])));
                                 request.answer(TicketCalls.CALLBACK_MY_TICKETS.name(), list.toArray(new String[0]));
                             }
                         });
