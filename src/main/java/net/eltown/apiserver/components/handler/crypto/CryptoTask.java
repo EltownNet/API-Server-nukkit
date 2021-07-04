@@ -58,6 +58,7 @@ public class CryptoTask {
                                 @Override
                                 public void run() {
                                     provider.updateWallet(wallet);
+                                    provider.updateTransaction(trans);
                                 }
                             }, 50L * count.incrementAndGet());
                         }
