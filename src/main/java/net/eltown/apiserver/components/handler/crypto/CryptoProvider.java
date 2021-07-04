@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class CryptoProvider {
 
     private final Map<String, Wallet> wallets = new HashMap<>();
+    @Getter
     private final Map<String, Transaction> transactions = new HashMap<>();
     private final MongoClient client;
     private final MongoCollection<Document> collection, worthCollection, transferCollection;
@@ -92,7 +93,8 @@ public class CryptoProvider {
             );
         }
 
-
+        final CryptoTask task = new CryptoTask(server, this);
+        task.run();
         server.log(this.wallets.size() + " Wallets geladen.");
     }
 
