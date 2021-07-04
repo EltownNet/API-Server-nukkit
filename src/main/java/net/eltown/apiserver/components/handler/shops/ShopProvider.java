@@ -87,7 +87,6 @@ public class ShopProvider {
     }
 
     private ItemPrice createPrice(final int[] id) {
-        System.out.println("createPrice scheiß java");
         final ItemPrice itemPrice = new ItemPrice(id, 5, 0, 0);
         this.getPrices().put(stringId(id), itemPrice);
         CompletableFuture.runAsync(() -> {

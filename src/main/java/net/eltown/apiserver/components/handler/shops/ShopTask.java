@@ -37,6 +37,8 @@ public class ShopTask {
                                 final double add = 1 + (toMultiply * increaseFactor);
 
                                 e.setPrice(e.getPrice() * add);
+                                e.setBought(0);
+                                e.setSold(0);
                                 provider.updatePrice(e);
                                 count.incrementAndGet();
                             }
@@ -56,8 +58,13 @@ public class ShopTask {
                         server.log("Speichere veränderte Shop Preise...");
 
                         provider.getToUpdate().forEach((id) -> {
-                            provider.updatePrice(provider.getPrices().get(id));
-                            count.incrementAndGet();
+                            timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                provider.updatePrice(provider.getPrices().get(id));
+                                count.incrementAndGet();
+                            }
+                        }, 50L * count.incrementAndGet());
                         });
 
                         provider.getToUpdate().clear();
