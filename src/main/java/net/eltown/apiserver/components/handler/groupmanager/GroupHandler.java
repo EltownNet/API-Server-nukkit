@@ -158,6 +158,11 @@ public class GroupHandler {
 
                         request.answer(GroupCalls.CALLBACK_GROUPS.name(), builder.toString());
                         break;
+                    case REQUEST_GET_PREFIX:
+                        if (this.provider.groups.containsKey(request.getData()[1])) {
+                            request.answer(GroupCalls.CALLBACK_GET_PREFIX.name(), this.provider.groups.get(request.getData()[1]).getPrefix());
+                        } else request.answer(GroupCalls.CALLBACK_NULL.name(), "null");
+                        break;
                 }
             }), "API/GroupManager", "groups");
         });
