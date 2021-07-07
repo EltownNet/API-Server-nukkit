@@ -1,15 +1,19 @@
 package net.eltown.apiserver.components.handler.groupmanager.data;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@AllArgsConstructor
+@Getter
+@Setter
 public class Group {
 
     private final String name;
-    private final String prefix;
-    private final List<String> permissions;
-    private final List<String> inheritances;
+    private String prefix;
+    private List<String> permissions;
+    private List<String> inheritances;
 
 }

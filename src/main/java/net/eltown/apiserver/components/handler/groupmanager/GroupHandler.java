@@ -163,6 +163,10 @@ public class GroupHandler {
                             request.answer(GroupCalls.CALLBACK_GET_PREFIX.name(), this.provider.groups.get(request.getData()[1]).getPrefix());
                         } else request.answer(GroupCalls.CALLBACK_NULL.name(), "null");
                         break;
+                    case REQUEST_CHANGE_PREFIX:
+                        this.provider.changePrefix(request.getData()[1], request.getData()[2]);
+                        request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                        break;
                 }
             }), "API/GroupManager", "groups");
         });

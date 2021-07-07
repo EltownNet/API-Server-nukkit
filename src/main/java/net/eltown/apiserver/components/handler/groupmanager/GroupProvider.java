@@ -89,6 +89,7 @@ public class GroupProvider {
 
     public void createGroup(final String group, final String prefix) {
         this.groups.put(group, new Group(group, prefix, new ArrayList<String>(), new ArrayList<String>()));
+        this.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
         CompletableFuture.runAsync(() -> {
             this.groupCollection.insertOne(new Document("group", group.toUpperCase()).append("prefix", prefix).append("permissions", new ArrayList<String>()).append("inheritances", new ArrayList<String>()));
         });
@@ -152,6 +153,18 @@ public class GroupProvider {
             list.remove(inheritance);
             this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("inheritances", list)));
         });
+    }
+
+    public void changePrefix(final String group, final String prefix) {
+        final Group sGroup = this.groups.get(group);
+        sGroup.setPrefix(prefix);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.groupCollection.find(new Document("group", group)).first();
+            assert document != null;
+            this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("prefix", prefix)));
+        });
+
+        this.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
     }
 
 }
