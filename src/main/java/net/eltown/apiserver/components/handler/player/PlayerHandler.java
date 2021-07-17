@@ -37,6 +37,8 @@ public class PlayerHandler {
                                 request[5],
                                 request[6],
                                 request[7],
+                                request[8],
+                                request[9],
                                 true
                         );
                         this.provider.set(request[1], set);
@@ -59,7 +61,7 @@ public class PlayerHandler {
                     case REQUEST_SYNC:
                         final SyncPlayer syncPlayer = this.provider.get(request.getData()[1]);
                         if (syncPlayer.isCanSync()) {
-                            request.answer(PlayerCalls.GOT_SYNC.name(), syncPlayer.getInvString() + "//" + syncPlayer.getEcString() + "//" + syncPlayer.getHealth() + "//" + syncPlayer.getFood() + "//" + syncPlayer.getExp() + "//" + syncPlayer.getLevel());
+                            request.answer(PlayerCalls.GOT_SYNC.name(), syncPlayer.getInvString() + "//" + syncPlayer.getEcString() + "//" + syncPlayer.getHealth() + "//" + syncPlayer.getFood() + "//" + syncPlayer.getExp() + "//" + syncPlayer.getLevel() + "//" + syncPlayer.getEffects() + "//" + syncPlayer.getGamemode());
                         } else {
                             request.answer(PlayerCalls.GOT_NOSYNC.name(), request.getData()[1]);
                         }

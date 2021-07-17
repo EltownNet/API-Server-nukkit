@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 public class SyncPlayer {
 
-    private String invString, ecString, health, food, exp, level;
+    private String invString, ecString, health, food, exp, level, effects, gamemode;
     //private float health;
     //private int food, exp, level;
     private boolean canSync;

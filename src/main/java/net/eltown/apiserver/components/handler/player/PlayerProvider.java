@@ -33,6 +33,8 @@ public class PlayerProvider {
                             document.getString("food"),
                             document.getString("exp"),
                             document.getString("level"),
+                            document.getString("effects"),
+                            document.getString("gamemode"),
                             true
                     )
             );
@@ -41,7 +43,7 @@ public class PlayerProvider {
     }
 
     public SyncPlayer get(String id) {
-        return players.getOrDefault(id, new SyncPlayer("empty", "empty", "20.0", "20", "0", "0", true));
+        return players.getOrDefault(id, new SyncPlayer("empty", "empty", "20.0", "20", "0", "0", "empty", "0", true));
     }
 
     public void set(String id, SyncPlayer player) {
@@ -54,7 +56,10 @@ public class PlayerProvider {
                         .append("health", player.getHealth())
                         .append("food", player.getFood())
                         .append("exp", player.getExp())
-                        .append("level", player.getLevel())));
+                        .append("level", player.getLevel()))
+                        .append("effects", player.getEffects())
+                        .append("gamemode", player.getGamemode())
+                );
             } else {
                 this.collection.insertOne(new Document("_id", id)
                         .append("inventory", player.getInvString())
@@ -63,6 +68,8 @@ public class PlayerProvider {
                         .append("food", player.getFood())
                         .append("exp", player.getExp())
                         .append("level", player.getLevel())
+                        .append("effects", player.getEffects())
+                        .append("gamemode", player.getGamemode())
                 );
             }
         });
