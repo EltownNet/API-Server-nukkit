@@ -30,6 +30,12 @@ public class LevelHandler {
                             this.provider.updateToDatabase(aLevel);
                         }
                         break;
+                    case REQUEST_UPDATE_REWARD:
+                        final int l =  Integer.parseInt(delivery.getData()[1]);
+                        if (this.provider.cachedRewardData.containsKey(l)) {
+                            this.provider.updateReward(Integer.parseInt(delivery.getData()[1]), delivery.getData()[2]);
+                        } else this.provider.insertReward(l, delivery.getData()[2]);
+                        break;
                 }
             }, "API/Level/Receive", "level.receive");
         });
@@ -39,6 +45,12 @@ public class LevelHandler {
                     case REQUEST_GET_LEVEL:
                         final Level targetLevel = this.provider.getLevelData(request.getData()[1]);
                         request.answer(LevelCalls.CALLBACK_LEVEL.name(), targetLevel.getPlayer(), String.valueOf(targetLevel.getLevel()), String.valueOf(targetLevel.getExperience()));
+                        break;
+                    case REQUEST_LEVEL_REWARD:
+                        final int levelReward = Integer.parseInt(request.getData()[1]);
+                        if (this.provider.cachedRewardData.containsKey(levelReward)) {
+                            request.answer(LevelCalls.CALLBACK_LEVEL_REWARD.name(), this.provider.cachedRewardData.get(levelReward));
+                        } else request.answer(LevelCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }
             }, "API/Level/Callback", "level.callback");

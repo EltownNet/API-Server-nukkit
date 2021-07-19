@@ -16,16 +16,18 @@ import java.util.concurrent.CompletableFuture;
 public class LevelProvider {
 
     private final MongoClient client;
-    private final MongoCollection<Document> levelCollection;
+    private final MongoCollection<Document> levelCollection, rewardCollection;
     public final TinyRabbit tinyRabbit;
 
     private final HashMap<String, Level> cachedData = new HashMap<>();
+    public final HashMap<Integer, String> cachedRewardData = new HashMap<>();
 
     @SneakyThrows
     public LevelProvider(final Server server) {
         final Config config = server.getConfig();
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
-        this.levelCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("level");
+        this.levelCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("player_level");
+        this.rewardCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("level_rewards");
 
         this.tinyRabbit = new TinyRabbit("localhost", "API/Level/Message");
 
@@ -36,6 +38,10 @@ public class LevelProvider {
                     document.getInteger("level"),
                     document.getDouble("experience")
             ));
+        }
+
+        for (final Document document : this.rewardCollection.find()) {
+            this.cachedRewardData.put(document.getInteger("_id"), document.getString("reward"));
         }
         server.log(this.cachedData.size() + " Leveldaten wurden in den Cache geladen.");
     }
@@ -59,9 +65,27 @@ public class LevelProvider {
 
     public void updateToDatabase(final Level level) {
         this.cachedData.put(level.getPlayer(), level);
+
         CompletableFuture.runAsync(() -> {
             this.levelCollection.updateOne(new Document("player", level.getPlayer()),
                     new Document("$set", new Document("level", level.getLevel()).append("experience", level.getExperience())));
+        });
+    }
+
+    public void insertReward(final int level, final String reward) {
+        this.cachedRewardData.put(level, reward);
+
+        CompletableFuture.runAsync(() -> {
+            this.rewardCollection.insertOne(new Document("_id", level).append("reward", reward));
+        });
+    }
+
+    public void updateReward(final int level, final String reward) {
+        this.cachedRewardData.remove(level);
+        this.cachedRewardData.put(level, reward);
+
+        CompletableFuture.runAsync(() -> {
+            this.rewardCollection.updateOne(new Document("_id", level), new Document("$set", new Document("reward", reward)));
         });
     }
 
