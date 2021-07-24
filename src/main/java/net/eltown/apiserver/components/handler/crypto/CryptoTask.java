@@ -20,7 +20,7 @@ public class CryptoTask {
     public CryptoTask(final Server server, final CryptoProvider provider) {
         this.server = server;
         this.provider = provider;
-        this.timer = new Timer("Shop Timer #1");
+        this.timer = new Timer("Crypto Timer #1");
     }
 
     public void run() {
