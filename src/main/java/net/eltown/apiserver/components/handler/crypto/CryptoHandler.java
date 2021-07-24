@@ -73,6 +73,8 @@ public class CryptoHandler {
                                         .append(e.getMinutesLeft())
                                         .append(">>")
                                         .append(e.isCompleted())
+                                        .append(">>")
+                                        .append(e.getMinutes())
                                         .append("&");
                             });
 
@@ -107,7 +109,7 @@ public class CryptoHandler {
                                 final String to = data[5];
                                 final int time = Integer.parseInt(data[6]);
 
-                                this.provider.addTransaction(new Transaction(id, amount, worth, asset, from, to, time, false));
+                                this.provider.addTransaction(new Transaction(id, amount, worth, asset, from, to, time, time, false));
                                 break;
                         }
                 }, "API/Crypto", "crypto.receive");

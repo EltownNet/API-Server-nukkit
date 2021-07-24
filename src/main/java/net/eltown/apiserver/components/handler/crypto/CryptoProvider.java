@@ -88,6 +88,7 @@ public class CryptoProvider {
                             document.getString("from"),
                             document.getString("to"),
                             document.getInteger("minutesLeft"),
+                            document.getInteger("minutes"),
                             document.getBoolean("completed")
                     )
             );
@@ -113,6 +114,7 @@ public class CryptoProvider {
                             .append("from", transaction.getFrom())
                             .append("to", transaction.getTo())
                             .append("minutesLeft", transaction.getMinutesLeft())
+                            .append("minutes", transaction.getMinutes())
                             .append("completed", transaction.isCompleted())
                     )
 
@@ -130,6 +132,7 @@ public class CryptoProvider {
                     .append("from", transaction.getFrom())
                     .append("to", transaction.getTo())
                     .append("minutesLeft", transaction.getMinutesLeft())
+                    .append("minutes", transaction.getMinutes())
                     .append("completed", transaction.isCompleted())
             );
         });

@@ -13,6 +13,7 @@ public class Transaction {
     private final String type, from, to;
     @Setter
     private int minutesLeft;
+    private final int minutes;
     @Setter
     private boolean completed;
 
