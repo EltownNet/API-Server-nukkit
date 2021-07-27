@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 public class Delivery {
 
-    private final String id, type, quality;
+    private final String id, receiver, type, quality;
 
-    private final int time;
+    private final int amount, time;
     @Setter
     private int timeLeft;
     @Setter

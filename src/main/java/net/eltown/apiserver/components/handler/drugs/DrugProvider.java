@@ -31,8 +31,10 @@ public class DrugProvider {
             this.deliveries.put(doc.getString("_id"),
                     new Delivery(
                             doc.getString("_id"),
+                            doc.getString("receiver"),
                             doc.getString("type"),
                             doc.getString("quality"),
+                            doc.getInteger("amount"),
                             doc.getInteger("time"),
                             doc.getInteger("timeLeft"),
                             doc.getBoolean("completed")
@@ -40,14 +42,20 @@ public class DrugProvider {
             );
         }
 
+        final DrugTask task = new DrugTask(server, this);
+        task.run();
+
+        server.log(this.deliveries.size() + " Lieferungen wurden in den Cache geladen.");
     }
 
     public void updateDelivery(final Delivery delivery) {
         this.deliveries.put(delivery.getId(), delivery);
         CompletableFuture.runAsync(() -> {
             this.deliveryCollection.updateOne(new Document("_id", delivery.getId()),
-                    new Document("$set", new Document("type", delivery.getType())
+                    new Document("$set", new Document("receiver", delivery.getReceiver())
+                            .append("type", delivery.getType())
                             .append("quality", delivery.getQuality())
+                            .append("amount", delivery.getAmount())
                             .append("time", delivery.getTime())
                             .append("timeLeft", delivery.getTimeLeft())
                             .append("completed", delivery.isCompleted())
@@ -61,8 +69,10 @@ public class DrugProvider {
         CompletableFuture.runAsync(() -> {
             this.deliveryCollection.insertOne(
                     new Document("_id", delivery.getId())
+                            .append("receiver", delivery.getReceiver())
                             .append("type", delivery.getType())
                             .append("quality", delivery.getQuality())
+                            .append("amount", delivery.getAmount())
                             .append("time", delivery.getTime())
                             .append("timeLeft", delivery.getTimeLeft())
                             .append("completed", delivery.isCompleted())
