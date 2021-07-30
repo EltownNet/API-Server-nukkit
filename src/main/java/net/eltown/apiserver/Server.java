@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
+import net.eltown.apiserver.components.handler.bank.BankHandler;
 import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
 import net.eltown.apiserver.components.handler.drugs.DrugHandler;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
@@ -46,6 +47,7 @@ public class Server {
     private GiftkeyHandler giftkeyHandler;
     private LevelHandler levelHandler;
     private DrugHandler drugHandler;
+    private BankHandler bankHandler;
 
     @SneakyThrows
     public void start() {
@@ -110,6 +112,10 @@ public class Server {
         this.log("Starte DrugHandler...");
         this.drugHandler = new DrugHandler(this);
         this.log("DrugHandler erfolgreich gestartet.");
+
+        this.log("Starte BankHandler...");
+        this.bankHandler = new BankHandler(this);
+        this.log("BankHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());

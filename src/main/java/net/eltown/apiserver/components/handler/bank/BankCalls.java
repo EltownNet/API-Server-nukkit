@@ -1,0 +1,15 @@
+package net.eltown.apiserver.components.handler.bank;
+
+public enum BankCalls {
+
+    REQUEST_GET_BANK_ACCOUNT,
+    CALLBACK_GET_BANK_ACCOUNT,
+    CALLBACK_NULL,
+    REQUEST_INSERT_LOG,
+    REQUEST_WITHDRAW_MONEY,
+    REQUEST_DEPOSIT_MONEY,
+    REQUEST_SET_MONEY,
+    REQUEST_CREATE_ACCOUNT,
+    CALLBACK_CREATE_ACCOUNT
+
+}
