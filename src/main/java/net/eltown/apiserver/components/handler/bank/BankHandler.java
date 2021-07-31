@@ -45,8 +45,8 @@ public class BankHandler {
                 final String[] d = request.getData();
                 switch (BankCalls.valueOf(request.getKey().toUpperCase())) {
                     case REQUEST_CREATE_ACCOUNT:
-                        this.provider.createBankAccount(d[1], d[2], password -> {
-                            request.answer(BankCalls.CALLBACK_CREATE_ACCOUNT.name(), password);
+                        this.provider.createBankAccount(d[1], d[2], (password, account) -> {
+                            request.answer(BankCalls.CALLBACK_CREATE_ACCOUNT.name(), password, account);
                         });
                         break;
                     case REQUEST_GET_BANK_ACCOUNT:

@@ -16,7 +16,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @AllArgsConstructor
 public class BankProvider {
@@ -57,9 +57,9 @@ public class BankProvider {
         server.log(this.bankAccounts.size() + " Bankkonten wurden in den Cache geladen...");
     }
 
-    public void createBankAccount(final String owner, final String prefix, final Consumer<String> callbackPassword) {
-        final String account = prefix + "-" + this.createKey(7) + "-" + this.createKey(2);
-        final String password = this.createPassword();
+    public void createBankAccount(final String owner, final String prefix, final BiConsumer<String, String> callbackPassword) {
+        final String account = prefix + "-" + this.createKey(7) + "-" + this.createNumberKey(2);
+        final String password = this.createNumberKey(4);
         this.bankAccounts.put(account, new BankAccount(account, owner, password, 0.0d, new ArrayList<>()));
 
         CompletableFuture.runAsync(() -> {
@@ -72,7 +72,7 @@ public class BankProvider {
         });
 
         this.insertBankLog(account, "Account erstellt.", "§fDas Konto wurde von §9" + owner + " §ferstellt.");
-        callbackPassword.accept(password);
+        callbackPassword.accept(password, account);
     }
 
     public void insertBankLog(final String account, final String title, final String details) {
@@ -123,7 +123,7 @@ public class BankProvider {
     }
 
     private String createKey(final int i) {
-        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678901234567890";
         final StringBuilder stringBuilder = new StringBuilder();
         final Random rnd = new Random();
         while (stringBuilder.length() < i) {
@@ -133,11 +133,11 @@ public class BankProvider {
         return stringBuilder.toString();
     }
 
-    private String createPassword() {
+    private String createNumberKey(final int i) {
         final String chars = "1234567890";
         final StringBuilder stringBuilder = new StringBuilder();
         final Random rnd = new Random();
-        while (stringBuilder.length() < 4) {
+        while (stringBuilder.length() < i) {
             int index = (int) (rnd.nextFloat() * chars.length());
             stringBuilder.append(chars.charAt(index));
         }
