@@ -15,6 +15,7 @@ public class LevelHandler {
     public LevelHandler(final Server server) {
         this.server = server;
         this.tinyRabbitListener = new TinyRabbitListener("localhost");
+        this.tinyRabbitListener.throwExceptions(true);
         this.provider = new LevelProvider(server);
         this.startCallbacking();
     }
@@ -31,7 +32,7 @@ public class LevelHandler {
                         }
                         break;
                     case REQUEST_UPDATE_REWARD:
-                        final int l =  Integer.parseInt(delivery.getData()[1]);
+                        final int l = Integer.parseInt(delivery.getData()[1]);
                         if (this.provider.cachedRewardData.containsKey(l)) {
                             this.provider.updateReward(Integer.parseInt(delivery.getData()[1]), delivery.getData()[2]);
                         } else this.provider.insertReward(l, delivery.getData()[2]);

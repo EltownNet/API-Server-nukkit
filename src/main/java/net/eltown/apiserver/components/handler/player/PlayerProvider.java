@@ -56,9 +56,9 @@ public class PlayerProvider {
                         .append("health", player.getHealth())
                         .append("food", player.getFood())
                         .append("exp", player.getExp())
-                        .append("level", player.getLevel()))
+                        .append("level", player.getLevel())
                         .append("effects", player.getEffects())
-                        .append("gamemode", player.getGamemode())
+                        .append("gamemode", player.getGamemode()))
                 );
             } else {
                 this.collection.insertOne(new Document("_id", id)
