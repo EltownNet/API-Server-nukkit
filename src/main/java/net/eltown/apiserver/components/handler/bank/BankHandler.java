@@ -36,6 +36,12 @@ public class BankHandler {
                     case REQUEST_SET_MONEY:
                         this.provider.setMoney(d[1], Double.parseDouble(d[2]));
                         break;
+                    case REQUEST_CHANGE_PASSWORD:
+                        this.provider.changePassword(d[1], d[2]);
+                        break;
+                    case REQUEST_CHANGE_DISPLAY_NAME:
+                        this.provider.changeDisplayName(d[1], d[2]);
+                        break;
                 }
             }, "API/Bank/Receive", "bank.receive");
         });
@@ -55,11 +61,11 @@ public class BankHandler {
                             final StringBuilder logs = new StringBuilder();
 
                             bankAccount.getBankLogs().forEach(e -> {
-                                logs.append(e.getLogId()).append(";").append(e.getTitle()).append(";").append(e.getDetails()).append(";").append(e.getDate()).append("#+#");
+                                logs.append(e.getLogId()).append(";").append(e.getTitle()).append(";").append(e.getDetails()).append(";").append(e.getDate()).append("--");
                             });
                             final String finalLogs = logs.substring(0, logs.length() - 3);
 
-                            request.answer(BankCalls.CALLBACK_GET_BANK_ACCOUNT.name(), bankAccount.getAccount(), bankAccount.getOwner(), bankAccount.getPassword(), String.valueOf(bankAccount.getBalance()), finalLogs);
+                            request.answer(BankCalls.CALLBACK_GET_BANK_ACCOUNT.name(), bankAccount.getAccount(), bankAccount.getDisplayName(), bankAccount.getOwner(), bankAccount.getPassword(), String.valueOf(bankAccount.getBalance()), finalLogs);
                         } else request.answer(BankCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }

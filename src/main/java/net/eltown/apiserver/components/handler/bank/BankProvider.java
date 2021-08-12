@@ -48,6 +48,7 @@ public class BankProvider {
 
             this.bankAccounts.put(document.getString("_id"), new BankAccount(
                     document.getString("_id"),
+                    document.getString("displayName"),
                     document.getString("owner"),
                     document.getString("password"),
                     document.getDouble("balance"),
@@ -60,10 +61,11 @@ public class BankProvider {
     public void createBankAccount(final String owner, final String prefix, final BiConsumer<String, String> callbackPassword) {
         final String account = prefix + "-" + this.createKey(7) + "-" + this.createNumberKey(2);
         final String password = this.createNumberKey(4);
-        this.bankAccounts.put(account, new BankAccount(account, owner, password, 0.0d, new ArrayList<>()));
+        this.bankAccounts.put(account, new BankAccount(account, account, owner, password, 0.0d, new ArrayList<>()));
 
         CompletableFuture.runAsync(() -> {
             this.bankCollection.insertOne(new Document("_id", account)
+                    .append("displayName", account)
                     .append("owner", owner)
                     .append("password", password)
                     .append("balance", 0.0d)
@@ -71,7 +73,7 @@ public class BankProvider {
             );
         });
 
-        this.insertBankLog(account, "Account erstellt.", "§fDas Konto wurde von §9" + owner + " §ferstellt.");
+        this.insertBankLog(account, "Account erstellt.", "§7Das Konto wurde von " + owner + " erstellt.");
         callbackPassword.accept(password, account);
     }
 
@@ -119,6 +121,24 @@ public class BankProvider {
 
         CompletableFuture.runAsync(() -> {
             this.bankCollection.updateOne(new Document("_id", account), new Document("$set", new Document("balance", bankAccount.getBalance())));
+        });
+    }
+
+    public void changePassword(final String account, final String password) {
+        final BankAccount bankAccount = this.bankAccounts.get(account);
+        bankAccount.setPassword(password);
+
+        CompletableFuture.runAsync(() -> {
+            this.bankCollection.updateOne(new Document("_id", account), new Document("$set", new Document("password", bankAccount.getPassword())));
+        });
+    }
+
+    public void changeDisplayName(final String account, final String displayName) {
+        final BankAccount bankAccount = this.bankAccounts.get(account);
+        bankAccount.setDisplayName(displayName);
+
+        CompletableFuture.runAsync(() -> {
+            this.bankCollection.updateOne(new Document("_id", account), new Document("$set", new Document("displayName", bankAccount.getDisplayName())));
         });
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 public class BankAccount {
 
     private final String account;
+    private String displayName;
     private final String owner;
     private String password;
     private double balance;
