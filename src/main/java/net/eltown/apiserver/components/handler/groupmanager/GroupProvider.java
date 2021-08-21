@@ -12,9 +12,7 @@ import net.eltown.apiserver.components.handler.groupmanager.data.GroupedPlayer;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -49,10 +47,11 @@ public class GroupProvider {
 
         server.log("Spieler werden in den Cache geladen...");
         for (final Document document : this.playerCollection.find()) {
-            this.groupedPlayers.put(document.getString("player"), new GroupedPlayer(
-                    document.getString("player"),
+            this.groupedPlayers.put(document.getString("_id"), new GroupedPlayer(
+                    document.getString("_id"),
                     document.getString("group"),
-                    document.getLong("duration")
+                    document.getLong("duration"),
+                    document.getList("permissions", String.class)
             ));
         }
         server.log(this.groupedPlayers.size() + " Spieler wurden in den Cache geladen...");
@@ -71,9 +70,9 @@ public class GroupProvider {
     }
 
     public void createPlayer(final String player) {
-        this.groupedPlayers.put(player, new GroupedPlayer(player, "SPIELER", -1));
+        this.groupedPlayers.put(player, new GroupedPlayer(player, "SPIELER", -1, Collections.singletonList("none")));
         CompletableFuture.runAsync(() -> {
-            this.playerCollection.insertOne(new Document("player", player).append("group", "SPIELER").append("duration", (long) -1));
+            this.playerCollection.insertOne(new Document("_id", player).append("group", "SPIELER").append("duration", (long) -1).append("permissions", Collections.singletonList("none")));
         });
     }
 
@@ -83,7 +82,7 @@ public class GroupProvider {
         System.out.println(group);
         System.out.println(this.groupedPlayers.get(player).getGroup());
         CompletableFuture.runAsync(() -> {
-            this.playerCollection.updateMany(new Document("player", player), new Document("$set", new Document("group", group).append("duration", duration)));
+            this.playerCollection.updateMany(new Document("_id", player), new Document("$set", new Document("group", group).append("duration", duration)));
         });
     }
 
@@ -128,6 +127,30 @@ public class GroupProvider {
             final List<String> list = document.getList("permissions", String.class);
             list.remove(permission);
             this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("permissions", list)));
+        });
+    }
+
+    public void addPlayerPermission(final String player, final String permission) {
+        final GroupedPlayer sGroup = this.groupedPlayers.get(player);
+        sGroup.getPermissions().add(permission);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.playerCollection.find(new Document("_id", player)).first();
+            assert document != null;
+            final List<String> list = document.getList("permissions", String.class);
+            list.add(permission);
+            this.playerCollection.updateOne(new Document("_id", player), new Document("$set", new Document("permissions", list)));
+        });
+    }
+
+    public void removePlayerPermission(final String player, final String permission) {
+        final GroupedPlayer sGroup = this.groupedPlayers.get(player);
+        sGroup.getPermissions().remove(permission);
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.playerCollection.find(new Document("_id", player)).first();
+            assert document != null;
+            final List<String> list = document.getList("permissions", String.class);
+            list.remove(permission);
+            this.playerCollection.updateOne(new Document("_id", player), new Document("$set", new Document("permissions", list)));
         });
     }
 

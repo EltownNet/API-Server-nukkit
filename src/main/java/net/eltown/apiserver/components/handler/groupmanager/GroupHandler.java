@@ -53,6 +53,14 @@ public class GroupHandler {
                             } else request.answer(GroupCalls.CALLBACK_GROUP_PERMISSION_ALREADY_ADDED.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
                         break;
+                    case REQUEST_ADD_PLAYER_PERMISSION:
+                        if (this.provider.groupedPlayers.containsKey(request.getData()[1])) {
+                            if (!this.provider.groupedPlayers.get(request.getData()[1]).getPermissions().contains(request.getData()[2])) {
+                                this.provider.addPlayerPermission(request.getData()[1], request.getData()[2]);
+                                request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                            } else request.answer(GroupCalls.CALLBACK_PLAYER_PERMISSION_ALREADY_ADDED.name(), "null");
+                        } else request.answer(GroupCalls.CALLBACK_PLAYER_DOES_NOT_EXIST.name(), "null");
+                        break;
                     case REQUEST_ADD_INHERITANCE:
                         if (this.provider.groups.containsKey(request.getData()[1])) {
                             if (!this.provider.groups.get(request.getData()[1]).getInheritances().contains(request.getData()[2])) {
@@ -68,6 +76,14 @@ public class GroupHandler {
                                 request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
                             } else request.answer(GroupCalls.CALLBACK_GROUP_PERMISSION_NOT_ADDED.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
+                        break;
+                    case REQUEST_REMOVE_PLAYER_PERMISSION:
+                        if (this.provider.groupedPlayers.containsKey(request.getData()[1])) {
+                            if (this.provider.groupedPlayers.get(request.getData()[1]).getPermissions().contains(request.getData()[2])) {
+                                this.provider.removePlayerPermission(request.getData()[1], request.getData()[2]);
+                                request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
+                            } else request.answer(GroupCalls.CALLBACK_PLAYER_PERMISSION_NOT_ADDED.name(), "null");
+                        } else request.answer(GroupCalls.CALLBACK_PLAYER_DOES_NOT_EXIST.name(), "null");
                         break;
                     case REQUEST_REMOVE_INHERITANCE:
                         if (this.provider.groups.containsKey(request.getData()[1])) {
@@ -127,7 +143,12 @@ public class GroupHandler {
                                 fInheritances2.append(s).append("#");
                             }
 
-                            request.answer(GroupCalls.CALLBACK_FULL_GROUP_PLAYER.name(), group2.getName(), group2.getPrefix(), fPermissions2.toString(), fInheritances2.toString());
+                            final StringBuilder fAdditionalPermissions2 = new StringBuilder();
+                            for (final String s : player.getPermissions()) {
+                                fAdditionalPermissions2.append(s).append("#");
+                            }
+
+                            request.answer(GroupCalls.CALLBACK_FULL_GROUP_PLAYER.name(), group2.getName(), String.valueOf(player.getDuration()), group2.getPrefix(), fPermissions2.toString(), fInheritances2.toString(), fAdditionalPermissions2.toString());
                         } catch (final Exception e) {
                             e.printStackTrace();
                         }
