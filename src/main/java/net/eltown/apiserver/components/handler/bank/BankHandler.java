@@ -43,7 +43,7 @@ public class BankHandler {
                         this.provider.changeDisplayName(d[1], d[2]);
                         break;
                 }
-            }, "API/Bank/Receive", "bank.receive");
+            }, "API/Bank[Receive]", "api.bank.receive");
         });
 
         this.server.getExecutor().execute(() -> {
@@ -69,7 +69,7 @@ public class BankHandler {
                         } else request.answer(BankCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }
-            }), "API/Bank/Callback", "bank.callback");
+            }), "API/Bank[Callback]", "api.bank.callback");
         });
     }
 

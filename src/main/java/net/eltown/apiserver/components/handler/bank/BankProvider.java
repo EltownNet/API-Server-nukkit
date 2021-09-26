@@ -33,7 +33,7 @@ public class BankProvider {
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
         this.bankCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("bank_accounts");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Bank/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Bank[Main]");
 
         server.log("Bankkonten werden in den Cache geladen...");
         for (final Document document : this.bankCollection.find()) {

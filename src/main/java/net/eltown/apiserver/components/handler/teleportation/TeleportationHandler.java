@@ -60,21 +60,21 @@ public class TeleportationHandler {
                         this.provider.cachedTeleportation.put(d[2], new Home(d[1], d[2], d[3], d[4], Double.parseDouble(d[5]), Double.parseDouble(d[6]), Double.parseDouble(d[7]), Double.parseDouble(d[8]), Double.parseDouble(d[9])));
 
                         if (!d[3].equals("null")) {
-                            this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TELEPORT.name(), d[2], d[3]);
+                            this.provider.tinyRabbit.send("core.proxy.teleportation.receive", TeleportationCalls.REQUEST_TELEPORT.name(), d[2], d[3]);
                         } else {
-                            this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TELEPORT.name(), d[2], "to##" + d[4]);
+                            this.provider.tinyRabbit.send("core.proxy.teleportation.receive", TeleportationCalls.REQUEST_TELEPORT.name(), d[2], "to##" + d[4]);
                         }
                         break;
                     case REQUEST_ACCEPT_TPA:
                         this.provider.removeTpa(delivery.getData()[1], delivery.getData()[2]);
 
-                        this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TELEPORT_TPA.name(), delivery.getData()[1], delivery.getData()[2]);
+                        this.provider.tinyRabbit.send("core.proxy.teleportation.receive", TeleportationCalls.REQUEST_TELEPORT_TPA.name(), delivery.getData()[1], delivery.getData()[2]);
                         break;
                     case REQUEST_DENY_TPA:
                         this.provider.removeTpa(delivery.getData()[1], delivery.getData()[2]);
                         break;
                 }
-            }, "API/Teleportation/Receive", "teleportation.receive");
+            }, "API/Teleportation[Receive]", "api.teleportation.receive");
         });
         this.server.getExecutor().execute(() -> {
             this.tinyRabbitListener.callback((request -> {
@@ -131,7 +131,7 @@ public class TeleportationHandler {
                                 this.provider.createTpa(request.getData()[1], request.getData()[2]);
                                 request.answer(TeleportationCalls.CALLBACK_NULL.name(), "null");
 
-                                this.provider.tinyRabbit.send("proxy.teleportation", TeleportationCalls.REQUEST_TPA_NOTIFICATION.name(), request.getData()[1], request.getData()[2]);
+                                this.provider.tinyRabbit.send("core.proxy.teleportation.receive", TeleportationCalls.REQUEST_TPA_NOTIFICATION.name(), request.getData()[1], request.getData()[2]);
                             } else request.answer(TeleportationCalls.CALLBACK_TPA_ALREADY_SENT.name(), "null");
                         } catch (final Exception e) {
                             e.printStackTrace();
@@ -150,7 +150,7 @@ public class TeleportationHandler {
                         }
                         break;
                 }
-            }), "API/Teleportation/Callback", "teleportation.callback");
+            }), "API/Teleportation[Callback]", "api.teleportation.callback");
         });
     }
 

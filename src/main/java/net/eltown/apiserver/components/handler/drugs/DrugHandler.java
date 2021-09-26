@@ -2,7 +2,6 @@ package net.eltown.apiserver.components.handler.drugs;
 
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
-import net.eltown.apiserver.components.handler.crypto.CryptoProvider;
 import net.eltown.apiserver.components.handler.drugs.data.Delivery;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
@@ -57,7 +56,7 @@ public class DrugHandler {
                         break;
                 }
 
-            }, "API/Drugs/Callback", "drugs.callback");
+            }, "API/Drugs[Callback]", "api.drugs.callback");
         });
     }
 
@@ -81,7 +80,7 @@ public class DrugHandler {
                         this.provider.removeDelivery(this.provider.getDeliveries().get(delivery.getData()[1]));
                         break;
                 }
-            }, "API/Drugs/Receive", "drugs.receive");
+            }, "API/Drugs[Receive]", "api.drugs.receive");
         });
     }
 

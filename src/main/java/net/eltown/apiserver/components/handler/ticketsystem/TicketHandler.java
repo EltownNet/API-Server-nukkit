@@ -5,7 +5,6 @@ import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.ticketsystem.data.Ticket;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -44,7 +43,7 @@ public class TicketHandler {
                         this.provider.closeTicket(d[2]);
                         break;
                 }
-            }, "API/Ticketsystem/Receive", "tickets.receive");
+            }, "API/Ticketsystem[Receive]", "api.ticketsystem.receive");
         });
 
         this.server.getExecutor().execute(() -> {
@@ -114,7 +113,7 @@ public class TicketHandler {
                         }
                         break;
                 }
-            }), "API/Ticketsystem/Callback", "tickets.callback");
+            }), "API/Ticketsystem[Callback]", "api.ticketsystem.callback");
         });
     }
 

@@ -13,7 +13,6 @@ import net.eltown.apiserver.components.handler.crypto.data.Worth;
 import org.bson.Document;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;

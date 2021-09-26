@@ -32,7 +32,7 @@ public class GiftkeyProvider {
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
         this.giftkeyCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("giftkeys");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Giftkeys/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Giftkeys[Main]");
 
         server.log("Giftkeys werden in den Cache geladen...");
         for (final Document document : this.giftkeyCollection.find()) {

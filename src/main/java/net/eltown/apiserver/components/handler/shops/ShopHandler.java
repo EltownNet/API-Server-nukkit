@@ -2,7 +2,6 @@ package net.eltown.apiserver.components.handler.shops;
 
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
-import net.eltown.apiserver.components.handler.crypto.CryptoProvider;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 public class ShopHandler {
@@ -31,7 +30,7 @@ public class ShopHandler {
                     );
                     break;
             }
-        }, "API/Shops", "shops.callback");
+        }, "API/Shops[Callback]", "api.shops.callback");
     }
 
     public void startListening() {
@@ -58,7 +57,7 @@ public class ShopHandler {
                     break;
             }
 
-        }, "API/Shops", "shops.receive");
+        }, "API/Shops[Receive]", "api.shops.receive");
     }
 
 }

@@ -7,7 +7,10 @@ import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class EconomyProvider {

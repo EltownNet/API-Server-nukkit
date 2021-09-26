@@ -30,7 +30,7 @@ public class TicketProvider {
         this.client = new MongoClient(new MongoClientURI(config.getString("MongoDB.Uri")));
         this.ticketCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("tickets");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Ticketsystem/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Ticketsystem[Main]");
 
         server.log("Tickets werden in den Cache geladen...");
         for (final Document document : this.ticketCollection.find()) {

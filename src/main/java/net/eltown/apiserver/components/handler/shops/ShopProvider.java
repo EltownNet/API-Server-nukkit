@@ -3,15 +3,12 @@ package net.eltown.apiserver.components.handler.shops;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.UpdateOptions;
 import lombok.Getter;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
-import net.eltown.apiserver.components.handler.player.data.SyncPlayer;
 import net.eltown.apiserver.components.handler.shops.data.ItemPrice;
 import org.bson.Document;
 
-import javax.swing.tree.ExpandVetoException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

@@ -29,13 +29,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Getter
 public class Server {
 
-    @Getter
     private ExecutorService executor;
 
     private Connection connection;
-    @Getter
+
     private Config config;
 
     private EconomyHandler economyHandler;
@@ -72,7 +72,7 @@ public class Server {
         this.log("Verbinde zu RabbitMQ...");
         final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        this.connection = factory.newConnection("API Server");
+        this.connection = factory.newConnection("API/System[Main]");
         this.log("Erfolgreich mit RabbitMQ verbunden.");
 
         this.log("Starte EconomyHandler...");

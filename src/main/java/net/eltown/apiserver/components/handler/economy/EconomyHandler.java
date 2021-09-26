@@ -1,6 +1,6 @@
 package net.eltown.apiserver.components.handler.economy;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Connection;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
@@ -43,7 +43,7 @@ public class EconomyHandler {
                         request.answer(EconomyCalls.CALLBACK_GETALL.name(), this.provider.getAll().toArray(new String[0]));
                         break;
                 }
-            }), "API Server", "economy");
+            }), "API/Economy[Callback]", "api.economy.callback");
         });
     }
 

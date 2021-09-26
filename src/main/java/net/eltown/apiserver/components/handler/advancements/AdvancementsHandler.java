@@ -25,7 +25,7 @@ public class AdvancementsHandler {
                 switch (AdvancementsCalls.valueOf(delivery.getKey().toUpperCase())) {
 
                 }
-            }, "API/Advancements/Receive", "advancements.receive");
+            }, "API/Advancements[Receive]", "api.advancements.receive");
         });
 
         this.server.getExecutor().execute(() -> {
@@ -34,7 +34,7 @@ public class AdvancementsHandler {
                 switch (AdvancementsCalls.valueOf(request.getKey().toUpperCase())) {
 
                 }
-            }), "API/Advancements/Callback", "advancements.callback");
+            }), "API/Advancements[Callback]", "api.advancements.callback");
         });
     }
 

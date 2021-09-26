@@ -1,6 +1,6 @@
 package net.eltown.apiserver.components.handler.player;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.Connection;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.player.data.SyncPlayer;
@@ -50,7 +50,7 @@ public class PlayerHandler {
                         break;
                 }
 
-            }), "API Server", "playersyncReceive");
+            }), "API/Sync[Receive]", "api.sync.receive");
         });
     }
 
@@ -67,7 +67,7 @@ public class PlayerHandler {
                         }
                         break;
                 }
-            }), "API Server", "playersync");
+            }), "API/Sync[Callback]", "api.sync.callback");
         });
     }
 

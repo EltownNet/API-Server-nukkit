@@ -2,7 +2,6 @@ package net.eltown.apiserver.components.handler.crypto.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor

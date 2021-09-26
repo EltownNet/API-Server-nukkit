@@ -31,7 +31,7 @@ public class GiftkeyHandler {
                         this.provider.deleteKey(d[1]);
                         break;
                 }
-            }, "API/Giftkeys/Receive", "giftkeys.receive");
+            }, "API/Giftkeys[Receive]", "api.giftkeys.receive");
         });
 
         this.server.getExecutor().execute(() -> {
@@ -90,7 +90,7 @@ public class GiftkeyHandler {
                         } else request.answer(GiftkeyCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }
-            }), "API/Giftkeys/Callback", "giftkeys.callback");
+            }), "API/Giftkeys[Callback]", "api.giftkeys.callback");
         });
     }
 

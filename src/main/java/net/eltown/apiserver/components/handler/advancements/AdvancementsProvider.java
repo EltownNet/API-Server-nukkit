@@ -11,7 +11,10 @@ import net.eltown.apiserver.components.handler.advancements.data.Advancement;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @AllArgsConstructor
@@ -31,7 +34,7 @@ public class AdvancementsProvider {
         this.advancementsCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("advancements_data");
         this.playerCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("advancements_players");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Advancements/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Advancements[Main]");
 
         server.log("Advancements werden in den Cache geladen...");
         for (final Document document : this.advancementsCollection.find()) {

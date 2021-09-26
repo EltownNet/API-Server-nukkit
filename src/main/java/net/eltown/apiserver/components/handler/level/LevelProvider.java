@@ -29,7 +29,7 @@ public class LevelProvider {
         this.levelCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("player_level");
         this.rewardCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("level_rewards");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Level/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Level[Main]");
 
         server.log("Leveldaten werden in den Cache geladen...");
         for (final Document document : this.levelCollection.find()) {

@@ -38,7 +38,7 @@ public class LevelHandler {
                         } else this.provider.insertReward(l, delivery.getData()[2]);
                         break;
                 }
-            }, "API/Level/Receive", "level.receive");
+            }, "API/Level[Receive]", "api.level.receive");
         });
         this.server.getExecutor().execute(() -> {
             this.tinyRabbitListener.callback(request -> {
@@ -54,7 +54,7 @@ public class LevelHandler {
                         } else request.answer(LevelCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }
-            }, "API/Level/Callback", "level.callback");
+            }, "API/Level[Callback]", "api.level.callback");
         });
     }
 }

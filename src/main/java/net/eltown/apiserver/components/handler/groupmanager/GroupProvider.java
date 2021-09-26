@@ -12,7 +12,10 @@ import net.eltown.apiserver.components.handler.groupmanager.data.GroupedPlayer;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -32,7 +35,7 @@ public class GroupProvider {
         this.groupCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("group_groups");
         this.playerCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("group_players");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/GroupManager/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Groupmanager[Main]");
 
         server.log("Gruppen werden in den Cache geladen...");
         for (final Document document : this.groupCollection.find()) {
@@ -88,7 +91,7 @@ public class GroupProvider {
 
     public void createGroup(final String group, final String prefix) {
         this.groups.put(group, new Group(group, prefix, new ArrayList<String>(), new ArrayList<String>()));
-        this.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
+        this.getTinyRabbit().send("core.proxy.groupmanager.receive", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
         CompletableFuture.runAsync(() -> {
             this.groupCollection.insertOne(new Document("group", group.toUpperCase()).append("prefix", prefix).append("permissions", new ArrayList<String>()).append("inheritances", new ArrayList<String>()));
         });
@@ -187,7 +190,7 @@ public class GroupProvider {
             this.groupCollection.updateOne(new Document("group", group), new Document("$set", new Document("prefix", prefix)));
         });
 
-        this.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
+        this.getTinyRabbit().send("core.proxy.groupmanager.receive", GroupCalls.REQUEST_CHANGE_PREFIX.name(), group, prefix);
     }
 
 }

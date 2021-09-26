@@ -34,7 +34,7 @@ public class TeleportationProvider {
         this.homeCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("teleportation_homes");
         this.warpCollection = this.client.getDatabase(config.getString("MongoDB.GroupDB")).getCollection("teleportation_warps");
 
-        this.tinyRabbit = new TinyRabbit("localhost", "API/Teleportation/Message");
+        this.tinyRabbit = new TinyRabbit("localhost", "API/Teleportation[Main]");
         this.tinyRabbit.throwExceptions(true);
 
         server.log("Homes werden in den Cache geladen...");

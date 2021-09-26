@@ -40,7 +40,7 @@ public class GroupHandler {
                                 if (!this.provider.isInGroup(request.getData()[1], request.getData()[2])) {
                                     this.provider.setGroup(request.getData()[1], request.getData()[2], Long.parseLong(request.getData()[4]));
                                     request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
-                                    this.provider.getTinyRabbit().send("groups.extern", GroupCalls.REQUEST_CHANGE_PLAYER_PREFIX.name(), request.getData()[1], request.getData()[2]);
+                                    this.provider.getTinyRabbit().send("core.proxy.groupmanager.receive", GroupCalls.REQUEST_CHANGE_PLAYER_PREFIX.name(), request.getData()[1], request.getData()[2]);
                                 } else request.answer(GroupCalls.CALLBACK_PLAYER_ALREADY_IN_GROUP.name(), "null");
                             } else request.answer(GroupCalls.CALLBACK_PLAYER_DOES_NOT_EXIST.name(), "null");
                         } else request.answer(GroupCalls.CALLBACK_GROUP_DOES_NOT_EXIST.name(), "null");
@@ -189,7 +189,7 @@ public class GroupHandler {
                         request.answer(GroupCalls.CALLBACK_SUCCESS.name(), "null");
                         break;
                 }
-            }), "API/GroupManager", "groups");
+            }), "API/Groupmanager[Main]", "api.groupmanager.main");
         });
     }
 

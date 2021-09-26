@@ -84,7 +84,7 @@ public class CryptoHandler {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }, "API/Crypto", "crypto.callback");
+            }, "API/Crypto[Callback]", "api.crypto.callback");
         });
 
         this.server.getExecutor().execute(() -> {
@@ -112,7 +112,7 @@ public class CryptoHandler {
                                 this.provider.addTransaction(new Transaction(id, amount, worth, asset, from, to, time, time, false));
                                 break;
                         }
-                }, "API/Crypto", "crypto.receive");
+                }, "API/Crypto[Receive]", "api.crypto.receive");
         });
 
     }
