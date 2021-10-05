@@ -75,7 +75,7 @@ public class CryptoTask {
             @Override
             public void run() {
 
-                server.log("Speichere veränderte Transaktionen...");
+                server.log(4, "Speichere veränderte Transaktionen...");
                 final AtomicInteger count = new AtomicInteger();
 
                 provider.getTransactions().values().forEach((transaction) -> {
@@ -88,7 +88,7 @@ public class CryptoTask {
                         }, 50L * count.incrementAndGet());
                     }
                 });
-                server.log(count.get() + " Transaktionen gespeichert.");
+                server.log(4, count.get() + " Transaktionen gespeichert.");
             }
         }, TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5));
     }

@@ -27,7 +27,7 @@ public class ShopTask {
                     @Override
                     public void run() {
                         final AtomicInteger count = new AtomicInteger();
-                        server.log("Aktualisiere Shop Preise...");
+                        server.log(4, "Aktualisiere Shop Preise...");
 
                         provider.getPrices().values().forEach((e) -> {
                             final int toDevide = e.getBought() - e.getSold();
@@ -44,7 +44,7 @@ public class ShopTask {
                             }
                         });
 
-                        server.log(count.get() + " Shop Preise wurde aktualisiert.");
+                        server.log(4, count.get() + " Shop Preise wurde aktualisiert.");
                     }
                 },
                 TimeUnit.HOURS.toMillis(1), TimeUnit.HOURS.toMillis(1));
@@ -55,7 +55,7 @@ public class ShopTask {
                     public void run() {
                         final AtomicInteger count = new AtomicInteger();
 
-                        server.log("Speichere veränderte Shop Preise...");
+                        server.log(4, "Speichere veränderte Shop Preise...");
 
                         provider.getToUpdate().forEach((id) -> {
                             timer.schedule(new TimerTask() {
@@ -69,7 +69,7 @@ public class ShopTask {
 
                         provider.getToUpdate().clear();
 
-                        server.log(count.get() + " Shop Preise wurden gespeichert.");
+                        server.log(4, count.get() + " Shop Preise wurden gespeichert.");
                     }
                 },
                 TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5));

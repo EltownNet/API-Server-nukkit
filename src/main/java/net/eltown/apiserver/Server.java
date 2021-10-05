@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.data.Colors;
+import net.eltown.apiserver.components.data.LogLevel;
 import net.eltown.apiserver.components.handler.advancements.AdvancementsHandler;
 import net.eltown.apiserver.components.handler.bank.BankHandler;
 import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
@@ -32,6 +33,8 @@ import java.util.concurrent.Executors;
 @Getter
 public class Server {
 
+    private static Server instance;
+
     private ExecutorService executor;
 
     private Connection connection;
@@ -51,14 +54,19 @@ public class Server {
     private BankHandler bankHandler;
     private AdvancementsHandler advancementsHandler;
 
+    public Server() {
+        instance = this;
+    }
+
     @SneakyThrows
     public void start() {
         this.log("Server wird gestartet...");
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        this.log(Runtime.getRuntime().availableProcessors() + " Threads erstellt.");
+        this.log(4, Runtime.getRuntime().availableProcessors() + " Threads erstellt.");
         this.config = new Config(this.getDataFolder() + "/config.yml", Config.YAML);
         config.reload();
         config.save();
+        if (!config.exists("LogLevel")) config.set("LogLevel", 1);
         if (!config.exists("MongoDB")) {
             config.set("MongoDB.Uri", "mongodb://root:Qco7TDqoYq3RXq4pA3y7ETQTK6AgqzmTtRGLsgbN@45.138.50.23:27017/admin?authSource=admin");
             config.set("MongoDB.PlayerDB", "eltown");
@@ -67,6 +75,8 @@ public class Server {
             config.set("MongoDB.GroupDB", "eltown");
             config.set("MongoDB.CryptoDB", "eltown");
         }
+        final int logLevel = config.getInt("LogLevel");
+        Internal.LOG_LEVEL = logLevel == 1 ? LogLevel.HIGH : logLevel == 2 ? LogLevel.MEDIUM : logLevel == 3 ? LogLevel.LOW : LogLevel.DEBUG;
         config.save();
 
         this.log("Verbinde zu RabbitMQ...");
@@ -75,53 +85,53 @@ public class Server {
         this.connection = factory.newConnection("API/System[Main]");
         this.log("Erfolgreich mit RabbitMQ verbunden.");
 
-        this.log("Starte EconomyHandler...");
+        this.log(4, "Starte EconomyHandler...");
         this.economyHandler = new EconomyHandler(this, this.connection);
-        this.log("EcomomyHandler erfolgreich gestartet.");
+        this.log(4, "EcomomyHandler erfolgreich gestartet.");
 
-        this.log("Starte CryptoHandler...");
+        this.log(4, "Starte CryptoHandler...");
         this.cryptoHandler = new CryptoHandler(this);
-        this.log("CryptoHandler erfolgreich gestartet.");
+        this.log(4, "CryptoHandler erfolgreich gestartet.");
 
-        this.log("Starte PlayerHandler...");
+        this.log(4, "Starte PlayerHandler...");
         this.playerHandler = new PlayerHandler(this, this.connection);
-        this.log("PlayerHandler erfolgreich gestartet.");
+        this.log(4, "PlayerHandler erfolgreich gestartet.");
 
-        this.log("Starte GroupHandler...");
+        this.log(4, "Starte GroupHandler...");
         this.groupHandler = new GroupHandler(this);
-        this.log("GroupHandler erfolgreich gestartet.");
+        this.log(4, "GroupHandler erfolgreich gestartet.");
 
-        this.log("Starte TeleportationHandler...");
+        this.log(4, "Starte TeleportationHandler...");
         this.teleportationHandler = new TeleportationHandler(this);
-        this.log("TeleportationHandler erfolgreich gestartet.");
+        this.log(4, "TeleportationHandler erfolgreich gestartet.");
 
-        this.log("Starte TicketHandler...");
+        this.log(4, "Starte TicketHandler...");
         this.ticketHandler = new TicketHandler(this);
-        this.log("TicketHandler erfolgreich gestartet.");
+        this.log(4, "TicketHandler erfolgreich gestartet.");
 
-        this.log("Starte ShopHandler...");
+        this.log(4, "Starte ShopHandler...");
         this.shopHandler = new ShopHandler(this);
-        this.log("ShopHandler erfolgreich gestartet.");
+        this.log(4, "ShopHandler erfolgreich gestartet.");
 
-        this.log("Starte GiftkeyHandler...");
+        this.log(4, "Starte GiftkeyHandler...");
         this.giftkeyHandler = new GiftkeyHandler(this);
-        this.log("GiftkeyHandler erfolgreich gestartet.");
+        this.log(4, "GiftkeyHandler erfolgreich gestartet.");
 
-        this.log("Starte LevelHandler...");
+        this.log(4, "Starte LevelHandler...");
         this.levelHandler = new LevelHandler(this);
-        this.log("LevelHandler erfolgreich gestartet.");
+        this.log(4, "LevelHandler erfolgreich gestartet.");
 
-        this.log("Starte DrugHandler...");
+        this.log(4, "Starte DrugHandler...");
         this.drugHandler = new DrugHandler(this);
-        this.log("DrugHandler erfolgreich gestartet.");
+        this.log(4, "DrugHandler erfolgreich gestartet.");
 
-        this.log("Starte BankHandler...");
+        this.log(4, "Starte BankHandler...");
         this.bankHandler = new BankHandler(this);
-        this.log("BankHandler erfolgreich gestartet.");
+        this.log(4, "BankHandler erfolgreich gestartet.");
 
-        this.log("Starte AdvancementHandler...");
+        this.log(4, "Starte AdvancementHandler...");
         this.advancementsHandler = new AdvancementsHandler(this);
-        this.log("AdvancementHandler erfolgreich gestartet.");
+        this.log(4, "AdvancementHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
@@ -139,20 +149,37 @@ public class Server {
         return Loader.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().replace("api-server.jar", "");
     }
 
-    public void log(String message) {
+    public static Server getInstance() {
+        return instance;
+    }
+
+    public void log(final String message) {
+        this.log(LogLevel.HIGH, message);
+    }
+
+    public void log(final int level, final String message) {
+        this.log(level == 1 ? LogLevel.HIGH : level == 2 ? LogLevel.MEDIUM : level == 3 ? LogLevel.LOW : LogLevel.DEBUG, message);
+    }
+
+    public void log(final LogLevel logLevel, final String message) {
         CompletableFuture.runAsync(() -> {
-            try {
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                LocalDateTime time = timestamp.toLocalDateTime();
-                System.out.println(Colors.ANSI_CYAN + time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + Colors.ANSI_WHITE + " [" + Colors.ANSI_BLUE + "LOG" + Colors.ANSI_WHITE + "] " + message);
-                String file = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + " [LOG] " + message + "\n";
-                Files.write(Paths.get("server.log"),
-                        file.getBytes(StandardCharsets.UTF_8),
-                        StandardOpenOption.CREATE,
-                        StandardOpenOption.APPEND
-                );
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            if (logLevel.level <= Internal.LOG_LEVEL.level) {
+                try {
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    LocalDateTime time = timestamp.toLocalDateTime();
+                    System.out.println(Colors.ANSI_CYAN + time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + Colors.ANSI_WHITE + " [" + Colors.ANSI_BLUE + "LOG" + Colors.ANSI_WHITE + "] " + message);
+                    String file = time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() + " [LOG] " + message + "\n";
+                    Files.write(Paths.get("logs/" + time.getDayOfMonth() + "-" + time.getMonth() + "-" + time.getYear() + ".log"),
+                            file.getBytes(StandardCharsets.UTF_8),
+                            StandardOpenOption.CREATE,
+                            StandardOpenOption.APPEND
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.out.println(Colors.ANSI_CYAN + "--------");
+                    System.out.println(Colors.ANSI_CYAN + "HINWEIS: " + Colors.ANSI_RESET + " Falls es sich um den logs/XX-MONAT-XXXX Fehler handelt, erstelle den Ordner 'logs'.");
+                    System.out.println(Colors.ANSI_CYAN + "--------");
+                }
             }
         });
     }

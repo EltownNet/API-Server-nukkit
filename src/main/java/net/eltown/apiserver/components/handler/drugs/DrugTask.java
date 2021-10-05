@@ -59,7 +59,7 @@ public class DrugTask {
             @Override
             public void run() {
 
-                server.log("Speichere veränderte Lieferungen...");
+                server.log(4, "Speichere veränderte Lieferungen...");
                 final AtomicInteger count = new AtomicInteger();
 
                 provider.getDeliveries().values().forEach((delivery) -> {
@@ -72,7 +72,7 @@ public class DrugTask {
                         }, 50L * count.incrementAndGet());
                     }
                 });
-                server.log(count.get() + " Lieferungen gespeichert.");
+                server.log(4, count.get() + " Lieferungen gespeichert.");
             }
         }, TimeUnit.MINUTES.toMillis(5), TimeUnit.MINUTES.toMillis(5));
     }

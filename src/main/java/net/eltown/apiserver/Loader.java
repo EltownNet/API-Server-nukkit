@@ -1,26 +1,20 @@
 package net.eltown.apiserver;
 
-import java.util.Scanner;
+import net.eltown.apiserver.components.data.Colors;
 
 public class Loader {
 
-    private static Scanner scanner;
     private static Server server;
+    private static Internal internal;
 
     public static void main(String[] args) {
-        scanner = new Scanner(System.in);
         server = new Server();
         server.start();
-        read();
-    }
 
-    private static void read() {
-        String input = scanner.nextLine();
-        if (input.equalsIgnoreCase("stop")) {
-            server.stop();
-            return;
-        }
-        read();
+        internal = new Internal();
+        internal.init();
+
+        server.log(Colors.ANSI_CYAN + "Hallo!");
     }
 
 }
