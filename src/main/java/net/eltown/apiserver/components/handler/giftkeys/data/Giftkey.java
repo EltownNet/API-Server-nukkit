@@ -15,5 +15,6 @@ public class Giftkey {
     private int maxUses;
     private List<String> uses;
     private List<String> rewards;
+    private List<String> marks;
 
 }

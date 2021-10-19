@@ -41,7 +41,8 @@ public class GiftkeyHandler {
                     case REQUEST_CREATE_KEY:
                         final int maxUses = Integer.parseInt(d[1]);
                         final List<String> rewards = Arrays.asList(d[2].split(">:<"));
-                        this.provider.createKey(maxUses, rewards, key -> {
+                        final List<String> marks = Arrays.asList(d[3].split(">:<"));
+                        this.provider.createKey(maxUses, rewards, marks, key -> {
                             request.answer(GiftkeyCalls.CALLBACK_NULL.name(), key);
                         });
                         break;
@@ -68,7 +69,13 @@ public class GiftkeyHandler {
                         giftkey.getRewards().forEach(e -> {
                             rewardsBuilder.append(e).append(">:<");
                         });
-                        builder.append(rewardsBuilder.substring(0, rewardsBuilder.length() - 3));
+                        builder.append(rewardsBuilder.substring(0, rewardsBuilder.length() - 3)).append(">>");
+
+                        final StringBuilder marksBuilder = new StringBuilder();
+                        giftkey.getMarks().forEach(e -> {
+                            marksBuilder.append(e).append(">:<");
+                        });
+                        builder.append(marksBuilder.substring(0, marksBuilder.length() - 3));
 
                         request.answer(GiftkeyCalls.CALLBACK_KEY.name(), builder.toString());
                         break;
@@ -87,6 +94,21 @@ public class GiftkeyHandler {
                                 final String redeemRewards = redeemBuilder.substring(0, redeemBuilder.length() - 3);
                                 request.answer(GiftkeyCalls.CALLBACK_REDEEMED.name(), redeemRewards);
                             } else request.answer(GiftkeyCalls.CALLBACK_ALREADY_REDEEMED.name(), "null");
+                        } else request.answer(GiftkeyCalls.CALLBACK_NULL.name(), "null");
+                        break;
+                    case REQUEST_USER_CODES:
+                        final List<String> list = this.provider.getKeysByMark(d[1]);
+                        if (!list.isEmpty()) {
+                            final StringBuilder codeBuilder = new StringBuilder();
+                            list.forEach(e -> codeBuilder.append(e).append(">:<"));
+                            final String codes = codeBuilder.substring(0, codeBuilder.length() - 3);
+                            request.answer(GiftkeyCalls.CALLBACK_USER_CODES.name(), codes);
+                        } else request.answer(GiftkeyCalls.CALLBACK_NULL.name(), "null");
+                        break;
+                    case REQUEST_ADD_MARK:
+                        if (this.provider.keyExists(d[1])) {
+                            this.provider.addMarkToKey(d[1], d[2], d[3]);
+                            request.answer(GiftkeyCalls.CALLBACK_MARK_ADDED.name(), "null");
                         } else request.answer(GiftkeyCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }

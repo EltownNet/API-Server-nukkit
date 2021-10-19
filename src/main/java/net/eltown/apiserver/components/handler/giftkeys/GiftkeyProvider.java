@@ -40,17 +40,18 @@ public class GiftkeyProvider {
                     document.getString("_id"),
                     document.getInteger("maxUses"),
                     document.getList("uses", String.class),
-                    document.getList("rewards", String.class)
+                    document.getList("rewards", String.class),
+                    document.getList("marks", String.class)
             ));
         }
         server.log(this.giftkeys.size() + " Giftkeys wurden in den Cache geladen...");
     }
 
-    public void createKey(final int maxUses, final List<String> rewards, final Consumer<String> keyCallback) {
-        final String key = this.createKey(6);
-        this.giftkeys.put(key, new Giftkey(key, maxUses, new ArrayList<>(), rewards));
+    public void createKey(final int maxUses, final List<String> rewards, List<String> marks, final Consumer<String> keyCallback) {
+        final String key = this.createKey(5) + "-" + this.createKey(5);
+        this.giftkeys.put(key, new Giftkey(key, maxUses, new ArrayList<>(), rewards, marks));
         CompletableFuture.runAsync(() -> {
-            this.giftkeyCollection.insertOne(new Document("_id", key).append("maxUses", maxUses).append("uses", new ArrayList<>()).append("rewards", rewards));
+            this.giftkeyCollection.insertOne(new Document("_id", key).append("maxUses", maxUses).append("uses", new ArrayList<>()).append("rewards", rewards).append("marks", marks));
         });
         keyCallback.accept(key);
     }
@@ -85,6 +86,37 @@ public class GiftkeyProvider {
         return aBoolean.get();
     }
 
+    public List<String> getKeysByMark(final String mark) {
+        final List<String> keyList = new ArrayList<>();
+        this.giftkeys.forEach((key, giftkey) -> {
+            if (giftkey.getMarks().contains(mark)) {
+                if (!giftkey.getUses().contains(mark)) {
+                    keyList.add(giftkey.getKey());
+                }
+            }
+        });
+        return keyList;
+    }
+
+    public void addMarkToKey(final String key, final String target, final String from) {
+        try {
+            final List<String> list = new ArrayList<>();
+            this.giftkeys.get(key).getMarks().forEach(e -> {
+                if (!e.equals(from)) {
+                    list.add(e);
+                }
+            });
+            list.add(target);
+            this.giftkeys.get(key).setMarks(list);
+
+            CompletableFuture.runAsync(() -> {
+                this.giftkeyCollection.updateOne(new Document("_id", key), new Document("$set", new Document("marks", list)));
+            });
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteKey(final String key) {
         this.giftkeys.remove(key);
         CompletableFuture.runAsync(() -> {
@@ -93,7 +125,7 @@ public class GiftkeyProvider {
     }
 
     private String createKey(final int i) {
-        final String chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ1234567890";
+        final String chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
         final StringBuilder stringBuilder = new StringBuilder();
         final Random rnd = new Random();
         while (stringBuilder.length() < i) {
