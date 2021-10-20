@@ -3,6 +3,7 @@ package net.eltown.apiserver.components.handler.level;
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.handler.level.data.Level;
+import net.eltown.apiserver.components.handler.level.data.LevelReward;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 public class LevelHandler {
@@ -34,8 +35,11 @@ public class LevelHandler {
                     case REQUEST_UPDATE_REWARD:
                         final int l = Integer.parseInt(delivery.getData()[1]);
                         if (this.provider.cachedRewardData.containsKey(l)) {
-                            this.provider.updateReward(Integer.parseInt(delivery.getData()[1]), delivery.getData()[2]);
-                        } else this.provider.insertReward(l, delivery.getData()[2]);
+                            this.provider.updateReward(l, delivery.getData()[2], delivery.getData()[3]);
+                        } else this.provider.insertReward(l, delivery.getData()[2], delivery.getData()[3]);
+                        break;
+                    case REQUEST_REMOVE_REWARD:
+                        this.provider.removeReward(Integer.parseInt(delivery.getData()[1]));
                         break;
                 }
             }, "API/Level[Receive]", "api.level.receive");
@@ -48,9 +52,10 @@ public class LevelHandler {
                         request.answer(LevelCalls.CALLBACK_LEVEL.name(), targetLevel.getPlayer(), String.valueOf(targetLevel.getLevel()), String.valueOf(targetLevel.getExperience()));
                         break;
                     case REQUEST_LEVEL_REWARD:
-                        final int levelReward = Integer.parseInt(request.getData()[1]);
-                        if (this.provider.cachedRewardData.containsKey(levelReward)) {
-                            request.answer(LevelCalls.CALLBACK_LEVEL_REWARD.name(), this.provider.cachedRewardData.get(levelReward));
+                        final int level = Integer.parseInt(request.getData()[1]);
+                        if (this.provider.cachedRewardData.containsKey(level)) {
+                            final LevelReward levelReward = this.provider.cachedRewardData.get(level);
+                            request.answer(LevelCalls.CALLBACK_LEVEL_REWARD.name(), String.valueOf(levelReward.getId()), levelReward.getDescription(), levelReward.getData());
                         } else request.answer(LevelCalls.CALLBACK_NULL.name(), "null");
                         break;
                 }

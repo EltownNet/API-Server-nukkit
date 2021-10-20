@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
 import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.handler.level.data.Level;
+import net.eltown.apiserver.components.handler.level.data.LevelReward;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
@@ -20,7 +21,7 @@ public class LevelProvider {
     public final TinyRabbit tinyRabbit;
 
     private final HashMap<String, Level> cachedData = new HashMap<>();
-    public final HashMap<Integer, String> cachedRewardData = new HashMap<>();
+    public final HashMap<Integer, LevelReward> cachedRewardData = new HashMap<>();
 
     @SneakyThrows
     public LevelProvider(final Server server) {
@@ -41,7 +42,11 @@ public class LevelProvider {
         }
 
         for (final Document document : this.rewardCollection.find()) {
-            this.cachedRewardData.put(document.getInteger("_id"), document.getString("reward"));
+            this.cachedRewardData.put(document.getInteger("_id"), new LevelReward(
+                    document.getInteger("_id"),
+                    document.getString("description"),
+                    document.getString("data")
+            ));
         }
         server.log(this.cachedData.size() + " Leveldaten wurden in den Cache geladen.");
     }
@@ -72,20 +77,28 @@ public class LevelProvider {
         });
     }
 
-    public void insertReward(final int level, final String reward) {
-        this.cachedRewardData.put(level, reward);
+    public void insertReward(final int level, final String description, final String data) {
+        this.cachedRewardData.put(level, new LevelReward(level, description, data));
 
         CompletableFuture.runAsync(() -> {
-            this.rewardCollection.insertOne(new Document("_id", level).append("reward", reward));
+            this.rewardCollection.insertOne(new Document("_id", level).append("description", description).append("data", data));
         });
     }
 
-    public void updateReward(final int level, final String reward) {
+    public void updateReward(final int level, final String description, final String data) {
         this.cachedRewardData.remove(level);
-        this.cachedRewardData.put(level, reward);
+        this.cachedRewardData.put(level, new LevelReward(level, description, data));
 
         CompletableFuture.runAsync(() -> {
-            this.rewardCollection.updateOne(new Document("_id", level), new Document("$set", new Document("reward", reward)));
+            this.rewardCollection.updateOne(new Document("_id", level), new Document("$set", new Document("description", description).append("data", data)));
+        });
+    }
+
+    public void removeReward(final int level) {
+        this.cachedRewardData.remove(level);
+
+        CompletableFuture.runAsync(() -> {
+           this.rewardCollection.findOneAndDelete(new Document("_id", level));
         });
     }
 
