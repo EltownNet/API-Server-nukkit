@@ -16,6 +16,7 @@ import net.eltown.apiserver.components.handler.giftkeys.GiftkeyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.level.LevelHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
+import net.eltown.apiserver.components.handler.rewards.RewardHandler;
 import net.eltown.apiserver.components.handler.shops.ShopHandler;
 import net.eltown.apiserver.components.handler.teleportation.TeleportationHandler;
 import net.eltown.apiserver.components.handler.ticketsystem.TicketHandler;
@@ -53,6 +54,7 @@ public class Server {
     private DrugHandler drugHandler;
     private BankHandler bankHandler;
     private AdvancementsHandler advancementsHandler;
+    private RewardHandler rewardHandler;
 
     public Server() {
         instance = this;
@@ -132,6 +134,10 @@ public class Server {
         this.log(4, "Starte AdvancementHandler...");
         this.advancementsHandler = new AdvancementsHandler(this);
         this.log(4, "AdvancementHandler erfolgreich gestartet.");
+
+        this.log(4, "Starte RewardHandler...");
+        this.rewardHandler = new RewardHandler(this);
+        this.log(4, "RewardHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
