@@ -242,11 +242,12 @@ public class TeleportationProvider {
     }
 
     public void removeTpa(final String target, final String player) {
-        this.tpas.get(target).forEach(e -> {
+        this.tpas.get(target).removeIf(e -> e.startsWith(player));
+        /*this.tpas.get(target).forEach(e -> {
             if (e.startsWith(player)) {
                 this.tpas.get(target).remove(e);
             }
-        });
+        });*/
     }
 
 }
