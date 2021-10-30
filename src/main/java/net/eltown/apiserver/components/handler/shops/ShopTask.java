@@ -34,9 +34,13 @@ public class ShopTask {
                             if (toDevide != 0) {
 
                                 final double toMultiply = (double) toDevide / (double) amountFactor;
-                                final double add = 1 + (toMultiply * increaseFactor);
+                                double add = 1 + (toMultiply * increaseFactor);
 
-                                e.setPrice(e.getPrice() * add);
+                                if (add > 2.0) add = 2.0;
+                                double newPrice = e.getPrice() * add;
+                                if (newPrice < 0.02) newPrice = 0.02;
+
+                                e.setPrice(newPrice);
                                 e.setBought(0);
                                 e.setSold(0);
                                 provider.updatePrice(e);
