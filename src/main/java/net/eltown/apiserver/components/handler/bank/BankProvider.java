@@ -142,6 +142,15 @@ public class BankProvider {
         });
     }
 
+    public String getAccountsByPlayer(final String player) {
+        final StringBuilder builder = new StringBuilder();
+
+        this.bankAccounts.values().forEach(e -> {
+            if (e.getOwner().equals(player)) builder.append(e.getAccount()).append("#");
+        });
+        return builder.substring(0, builder.length() - 1);
+    }
+
     private String createKey(final int i) {
         final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678901234567890";
         final StringBuilder stringBuilder = new StringBuilder();

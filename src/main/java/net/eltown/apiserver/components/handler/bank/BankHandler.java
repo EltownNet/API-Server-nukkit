@@ -68,6 +68,9 @@ public class BankHandler {
                             request.answer(BankCalls.CALLBACK_GET_BANK_ACCOUNT.name(), bankAccount.getAccount(), bankAccount.getDisplayName(), bankAccount.getOwner(), bankAccount.getPassword(), String.valueOf(bankAccount.getBalance()), finalLogs);
                         } else request.answer(BankCalls.CALLBACK_NULL.name(), "null");
                         break;
+                    case REQUEST_BANKACCOUNTS_BY_PLAYER:
+                        request.answer(BankCalls.CALLBACK_BANKACCOUNTS_BY_PLAYER.name(), this.provider.getAccountsByPlayer(d[1]));
+                        break;
                 }
             }), "API/Bank[Callback]", "api.bank.callback");
         });
