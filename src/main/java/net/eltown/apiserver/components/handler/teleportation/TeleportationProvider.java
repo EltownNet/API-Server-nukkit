@@ -217,7 +217,7 @@ public class TeleportationProvider {
         final Set<String> set = new HashSet<>();
         if (this.tpas.get(target) == null) return set;
 
-        this.tpas.get(target).forEach(e -> {
+        new ArrayList<>(this.tpas.get(target)).forEach(e -> {
             if (Long.parseLong(e.split(":")[1]) < System.currentTimeMillis()) {
                 this.removeTpa(target, e.split(":")[0]);
             } else set.add(e.split(":")[0]);
@@ -229,7 +229,7 @@ public class TeleportationProvider {
         final AtomicBoolean aBoolean = new AtomicBoolean(false);
         this.tpas.computeIfAbsent(target, k -> new ArrayList<>());
 
-        this.tpas.get(target).forEach(e -> {
+        new ArrayList<>(this.tpas.get(target)).forEach(e -> {
             if (e.startsWith(player)) {
                 final long time = Long.parseLong(e.split(":")[1]);
                 if (System.currentTimeMillis() > time) {

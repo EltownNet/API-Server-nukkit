@@ -99,7 +99,7 @@ public class GroupHandler {
 
                         for (final String s : group.getInheritances()) {
                             final Group iGroup = this.provider.groups.get(s);
-                            for (final String f : iGroup.getPermissions()) {
+                            for (final String f : new ArrayList<>(iGroup.getPermissions())) {
                                 if (!lPermissions.contains(f)) lPermissions.add(f);
                             }
                         }
@@ -110,7 +110,7 @@ public class GroupHandler {
                         }
 
                         final StringBuilder fInheritances = new StringBuilder();
-                        for (final String s : group.getInheritances()) {
+                        for (final String s : new ArrayList<>(group.getInheritances())) {
                             fInheritances.append(s).append("#");
                         }
 
@@ -128,7 +128,7 @@ public class GroupHandler {
 
                             for (final String s : group2.getInheritances()) {
                                 final Group iGroup = this.provider.groups.get(s);
-                                for (final String f : iGroup.getPermissions()) {
+                                for (final String f : new ArrayList<>(iGroup.getPermissions())) {
                                     if (!lPermissions2.contains(f)) lPermissions2.add(f);
                                 }
                             }
@@ -139,12 +139,12 @@ public class GroupHandler {
                             }
 
                             final StringBuilder fInheritances2 = new StringBuilder();
-                            for (final String s : group2.getInheritances()) {
+                            for (final String s : new ArrayList<>(group2.getInheritances())) {
                                 fInheritances2.append(s).append("#");
                             }
 
                             final StringBuilder fAdditionalPermissions2 = new StringBuilder();
-                            for (final String s : player.getPermissions()) {
+                            for (final String s : new ArrayList<>(player.getPermissions())) {
                                 fAdditionalPermissions2.append(s).append("#");
                             }
 
