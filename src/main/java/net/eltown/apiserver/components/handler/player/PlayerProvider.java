@@ -31,8 +31,8 @@ public class PlayerProvider {
                             document.getString("enderchest"),
                             document.getString("health"),
                             document.getString("food"),
-                            document.getString("exp"),
                             document.getString("level"),
+                            document.getString("exp"),
                             document.getString("effects"),
                             document.getString("gamemode"),
                             true
