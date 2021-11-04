@@ -10,7 +10,7 @@ import lombok.Setter;
 public class ItemPrice {
 
     private int[] id;
-    private double price;
+    private double price, minBuy, minSell;
     private int bought, sold;
 
     public void addBought(final int amount) {

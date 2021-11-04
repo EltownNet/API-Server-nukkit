@@ -2,6 +2,7 @@ package net.eltown.apiserver.components.handler.shops;
 
 import lombok.SneakyThrows;
 import net.eltown.apiserver.Server;
+import net.eltown.apiserver.components.handler.shops.data.ItemPrice;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 public class ShopHandler {
@@ -25,11 +26,20 @@ public class ShopHandler {
             final String[] data = request.getData();
             switch (ShopCalls.valueOf(request.getKey())) {
                 case REQUEST_ITEM_PRICE:
-                    request.answer(ShopCalls.REQUEST_ITEM_PRICE.name(), "" +
-                            this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])}),
-                            "" + this.provider.getSellPrice(this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])}))
+                    final double[] prices = this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])});
+
+                    request.answer(ShopCalls.REQUEST_ITEM_PRICE.name(),
+                            "" + prices[0],
+                            "" + prices[1]
                     );
                     break;
+                case REQUEST_MIN_BUY_SELL:
+                    final ItemPrice price = this.provider.getPrices().get(data[1] + ":" + data[2]);
+
+                    request.answer(ShopCalls.REQUEST_MIN_BUY_SELL.name(),
+                            "" + price.getMinBuy(),
+                            "" + price.getMinSell()
+                    );
             }
         }, "API/Shops[Callback]", "api.shops.callback");
     }
@@ -52,6 +62,18 @@ public class ShopHandler {
                     break;
                 case UPDATE_ITEM_PRICE:
                     this.provider.setPrice(
+                            new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])},
+                            Double.parseDouble(data[3])
+                    );
+                    break;
+                case UPDATE_MIN_BUY:
+                    this.provider.setMinBuy(
+                            new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])},
+                            Double.parseDouble(data[3])
+                    );
+                    break;
+                case UPDATE_MIN_SELL:
+                    this.provider.setMinSell(
                             new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])},
                             Double.parseDouble(data[3])
                     );

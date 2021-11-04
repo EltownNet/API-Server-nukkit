@@ -11,8 +11,6 @@ public class ShopTask {
 
     private final Timer timer;
     private final ShopProvider provider;
-    private final double increaseFactor = 0.05;
-    private final int amountFactor = 64;
     private final Server server;
 
     public ShopTask(final Server server, final ShopProvider provider) {
@@ -26,32 +24,10 @@ public class ShopTask {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        final AtomicInteger count = new AtomicInteger();
-                        server.log(4, "Aktualisiere Shop Preise...");
-
-                        provider.getPrices().values().forEach((e) -> {
-                            final int toDevide = e.getBought() - e.getSold();
-                            if (toDevide != 0) {
-
-                                final double toMultiply = (double) toDevide / (double) amountFactor;
-                                double add = 1 + (toMultiply * increaseFactor);
-
-                                if (add > 2.0) add = 2.0;
-                                double newPrice = e.getPrice() * add;
-                                if (newPrice < 0.02) newPrice = 0.02;
-
-                                e.setPrice(newPrice);
-                                e.setBought(0);
-                                e.setSold(0);
-                                provider.updatePrice(e);
-                                count.incrementAndGet();
-                            }
-                        });
-
-                        server.log(4, count.get() + " Shop Preise wurde aktualisiert.");
+                        provider.updatePrices();
                     }
                 },
-                TimeUnit.HOURS.toMillis(1), TimeUnit.HOURS.toMillis(1));
+                TimeUnit.MINUTES.toMillis(10), TimeUnit.MINUTES.toMillis(10));
 
         this.timer.schedule(
                 new TimerTask() {
