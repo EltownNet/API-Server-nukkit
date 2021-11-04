@@ -48,6 +48,10 @@ public class ShopProvider {
         return this.prices.containsKey(this.stringId(id)) ? this.prices.get(this.stringId(id)).getPrice() : this.createPrice(id).getPrice();
     }
 
+    public double getSellPrice(final double d) {
+        return .23 * d;
+    }
+
     public void setPrice(final int[] id, final double price) {
         final ItemPrice ip = this.prices.getOrDefault(stringId(id), this.createPrice(id));
         ip.setPrice(price);

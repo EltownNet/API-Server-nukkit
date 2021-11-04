@@ -26,7 +26,8 @@ public class ShopHandler {
             switch (ShopCalls.valueOf(request.getKey())) {
                 case REQUEST_ITEM_PRICE:
                     request.answer(ShopCalls.REQUEST_ITEM_PRICE.name(), "" +
-                            this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])})
+                            this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])}),
+                            "" + this.provider.getSellPrice(this.provider.getPrice(new int[]{Integer.parseInt(data[1]), Integer.parseInt(data[2])}))
                     );
                     break;
             }
