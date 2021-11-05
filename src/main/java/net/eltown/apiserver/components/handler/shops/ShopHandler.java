@@ -40,6 +40,7 @@ public class ShopHandler {
                             "" + price.getMinBuy(),
                             "" + price.getMinSell()
                     );
+                    break;
             }
         }, "API/Shops[Callback]", "api.shops.callback");
     }

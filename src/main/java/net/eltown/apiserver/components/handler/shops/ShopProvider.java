@@ -9,10 +9,7 @@ import net.eltown.apiserver.components.config.Config;
 import net.eltown.apiserver.components.handler.shops.data.ItemPrice;
 import org.bson.Document;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,19 +70,19 @@ public class ShopProvider {
     }
 
     public void setMinBuy(final int[] id, final double minBuy) {
-        final ItemPrice ip = this.prices.getOrDefault(stringId(id), this.createPrice(id));
+        final ItemPrice ip = this.prices.get(stringId(id));
         ip.setMinBuy(minBuy);
         this.updatePrice(ip);
     }
 
     public void setMinSell(final int[] id, final double minSell) {
-        final ItemPrice ip = this.prices.getOrDefault(stringId(id), this.createPrice(id));
+        final ItemPrice ip = this.prices.get(stringId(id));
         ip.setMinSell(minSell);
         this.updatePrice(ip);
     }
 
     public void setPrice(final int[] id, final double price) {
-        final ItemPrice ip = this.prices.getOrDefault(stringId(id), this.createPrice(id));
+        final ItemPrice ip = this.prices.get(stringId(id));
         ip.setPrice(price);
         this.updatePrice(ip);
     }
@@ -166,6 +163,8 @@ public class ShopProvider {
                             .append("price", 5d)
                             .append("bought", 0)
                             .append("sold", 0)
+                            .append("minBuy", 0.25d)
+                            .append("minSell", 0.01d)
             );
         });
 
