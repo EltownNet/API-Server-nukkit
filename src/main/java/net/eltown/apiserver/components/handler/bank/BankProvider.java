@@ -143,11 +143,14 @@ public class BankProvider {
     }
 
     public String getAccountsByPlayer(final String player) {
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder("");
 
         this.bankAccounts.values().forEach(e -> {
             if (e.getOwner().equals(player)) builder.append(e.getAccount()).append("#");
         });
+
+        if (builder.toString().isEmpty()) return "null";
+
         return builder.substring(0, builder.length() - 1);
     }
 
