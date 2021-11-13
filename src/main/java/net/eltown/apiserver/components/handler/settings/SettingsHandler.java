@@ -30,6 +30,9 @@ public class SettingsHandler {
                     case REQUEST_REMOVE_SETTINGS:
                         this.provider.removeEntry(d[1], d[2]);
                         break;
+                    case REQUEST_UPDATE_ALL:
+                        this.provider.updateAll(d[1], d[2]);
+                        break;
                 }
             }, "API/Settings[Receive]", "api.settings.receive");
         });
@@ -38,15 +41,17 @@ public class SettingsHandler {
                 final String[] d = request.getData();
                 switch (SettingsCalls.valueOf(request.getKey().toUpperCase())) {
                     case REQUEST_SETTINGS:
+                        if (!this.provider.cachedSettings.containsKey(d[1])) this.provider.createAccountSettings(d[1]);
                         final StringBuilder builder = new StringBuilder();
                         this.provider.cachedSettings.get(d[1]).getSettings().forEach((key, value) -> {
                             builder.append(key).append(":").append(value).append(">:<");
                         });
+                        if (builder.toString().isEmpty()) builder.append("null>:<");
                         final String settings = builder.substring(0, builder.length() - 3);
                         request.answer(SettingsCalls.CALLBACK_SETTINGS.name(), settings);
                         break;
                     case REQUEST_ENTRY:
-                        request.answer(SettingsCalls.CALLBACK_SETTINGS.name(), this.provider.getEntry(d[1], d[2], d[3]));
+                        request.answer(SettingsCalls.CALLBACK_ENTRY.name(), this.provider.getEntry(d[1], d[2], d[3]));
                         break;
                 }
             }, "API/Settings[Callback]", "api.settings.callback");

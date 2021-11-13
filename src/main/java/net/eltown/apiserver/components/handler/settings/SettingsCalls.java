@@ -8,5 +8,6 @@ public enum SettingsCalls {
     CALLBACK_SETTINGS,
     REQUEST_ENTRY,
     CALLBACK_ENTRY,
+    REQUEST_UPDATE_ALL
 
 }

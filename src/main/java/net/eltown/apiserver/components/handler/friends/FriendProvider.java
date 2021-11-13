@@ -55,40 +55,30 @@ public class FriendProvider {
     }
 
     public void createFriendRequest(final String player, final String target) {
-        this.cachedFriendData.get(player).getRequests().add(target);
         this.cachedFriendData.get(target).getRequests().add(player);
 
         CompletableFuture.runAsync(() -> {
-            final Document pD = this.friendsCollection.find(new Document("_id", player)).first();
             final Document tD = this.friendsCollection.find(new Document("_id", target)).first();
-            assert pD != null && tD != null;
+            assert tD != null;
 
-            final List<String> pDSet = pD.getList("requests", String.class);
-            pDSet.add(target);
-            final List<String> tDSet = pD.getList("requests", String.class);
+            final List<String> tDSet = tD.getList("requests", String.class);
             tDSet.add(player);
 
-            this.friendsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("requests", pDSet)));
             this.friendsCollection.updateOne(new Document("_id", target), new Document("$set", new Document("requests", tDSet)));
         });
     }
 
     public void removeFriendRequest(final String player, final String target) {
         this.cachedFriendData.get(player).getRequests().remove(target);
-        this.cachedFriendData.get(target).getRequests().remove(player);
 
         CompletableFuture.runAsync(() -> {
-            final Document pD = this.friendsCollection.find(new Document("_id", player)).first();
-            final Document tD = this.friendsCollection.find(new Document("_id", target)).first();
-            assert pD != null && tD != null;
+            final Document tD = this.friendsCollection.find(new Document("_id", player)).first();
+            assert tD != null;
 
-            final List<String> pDSet = pD.getList("requests", String.class);
-            pDSet.remove(target);
-            final List<String> tDSet = pD.getList("requests", String.class);
-            tDSet.remove(player);
+            final List<String> tDSet = tD.getList("requests", String.class);
+            tDSet.remove(target);
 
-            this.friendsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("requests", pDSet)));
-            this.friendsCollection.updateOne(new Document("_id", target), new Document("$set", new Document("requests", tDSet)));
+            this.friendsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("requests", tDSet)));
         });
     }
 
@@ -103,7 +93,7 @@ public class FriendProvider {
 
             final List<String> pDSet = pD.getList("friends", String.class);
             pDSet.add(target);
-            final List<String> tDSet = pD.getList("friends", String.class);
+            final List<String> tDSet = tD.getList("friends", String.class);
             tDSet.add(player);
 
             this.friendsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("friends", pDSet)));
@@ -122,7 +112,7 @@ public class FriendProvider {
 
             final List<String> pDSet = pD.getList("friends", String.class);
             pDSet.remove(target);
-            final List<String> tDSet = pD.getList("friends", String.class);
+            final List<String> tDSet = tD.getList("friends", String.class);
             tDSet.remove(player);
 
             this.friendsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("friends", pDSet)));

@@ -11,10 +11,7 @@ import net.eltown.apiserver.components.handler.settings.data.AccountSettings;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbit;
 import org.bson.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -83,6 +80,25 @@ public class SettingsProvider {
                 }
             });
             set.add(key + ":" + value);
+
+            this.settingsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("settings", set)));
+        });
+    }
+
+    public void updateAll(final String player, final String settings) {
+        if (!this.cachedSettings.containsKey(player)) this.createAccountSettings(player);
+
+        final List<String> rawData = Arrays.asList(settings.split(">:<"));
+        final Map<String, String> map = new HashMap<>();
+        rawData.forEach(e -> {
+            map.put(e.split(":")[0], e.split(":")[1]);
+        });
+        this.cachedSettings.get(player).setSettings(map);
+
+        CompletableFuture.runAsync(() -> {
+            final Document document = this.settingsCollection.find(new Document("_id", player)).first();
+            assert document != null;
+            final List<String> set = new ArrayList<>(rawData);
 
             this.settingsCollection.updateOne(new Document("_id", player), new Document("$set", new Document("settings", set)));
         });

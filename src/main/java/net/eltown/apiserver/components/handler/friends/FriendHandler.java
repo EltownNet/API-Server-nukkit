@@ -54,18 +54,25 @@ public class FriendHandler {
                         request.answer(FriendCalls.CALLBACK_REQUEST_EXISTS.name(), String.valueOf(this.provider.requestExists(d[1], d[2])));
                         break;
                     case REQUEST_FRIEND_DATA:
+                        if (!this.provider.friendDataExists(d[1])) {
+                            request.answer(FriendCalls.CALLBACK_NULL.name(), "null");
+                            return;
+                        }
+
                         final FriendData data = this.provider.cachedFriendData.get(d[1]);
 
                         final StringBuilder friendBuilder = new StringBuilder();
                         data.getFriends().forEach(e -> {
                             friendBuilder.append(e).append(":");
                         });
+                        if (friendBuilder.toString().isEmpty()) friendBuilder.append("null:");
                         final String friends = friendBuilder.substring(0, friendBuilder.length() - 1);
 
                         final StringBuilder requestBuilder = new StringBuilder();
                         data.getRequests().forEach(e -> {
                             requestBuilder.append(e).append(":");
                         });
+                        if (requestBuilder.toString().isEmpty()) requestBuilder.append("null:");
                         final String requests = requestBuilder.substring(0, requestBuilder.length() - 1);
 
                         request.answer(FriendCalls.CALLBACK_FRIEND_DATA.name(), friends, requests);
