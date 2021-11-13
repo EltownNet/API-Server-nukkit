@@ -12,12 +12,14 @@ import net.eltown.apiserver.components.handler.bank.BankHandler;
 import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
 import net.eltown.apiserver.components.handler.drugs.DrugHandler;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
+import net.eltown.apiserver.components.handler.friends.FriendHandler;
 import net.eltown.apiserver.components.handler.giftkeys.GiftkeyHandler;
 import net.eltown.apiserver.components.handler.groupmanager.GroupHandler;
 import net.eltown.apiserver.components.handler.level.LevelHandler;
 import net.eltown.apiserver.components.handler.player.PlayerHandler;
 import net.eltown.apiserver.components.handler.quests.QuestHandler;
 import net.eltown.apiserver.components.handler.rewards.RewardHandler;
+import net.eltown.apiserver.components.handler.settings.SettingsHandler;
 import net.eltown.apiserver.components.handler.shops.ShopHandler;
 import net.eltown.apiserver.components.handler.teleportation.TeleportationHandler;
 import net.eltown.apiserver.components.handler.ticketsystem.TicketHandler;
@@ -57,6 +59,8 @@ public class Server {
     private AdvancementsHandler advancementsHandler;
     private RewardHandler rewardHandler;
     private QuestHandler questHandler;
+    private FriendHandler friendHandler;
+    private SettingsHandler settingsHandler;
 
     public Server() {
         instance = this;
@@ -144,6 +148,14 @@ public class Server {
         this.log(4, "Starte QuestHandler...");
         this.questHandler = new QuestHandler(this);
         this.log(4, "QuestHandler erfolgreich gestartet.");
+
+        this.log(4, "Starte FriendHandler...");
+        this.friendHandler = new FriendHandler(this);
+        this.log(4, "FriendHandler erfolgreich gestartet.");
+
+        this.log(4, "Starte SettingsHandler...");
+        this.settingsHandler = new SettingsHandler(this);
+        this.log(4, "SettingsHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
