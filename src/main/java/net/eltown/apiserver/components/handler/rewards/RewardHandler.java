@@ -41,7 +41,7 @@ public class RewardHandler {
                         this.provider.addStreak(d[1]);
                         break;
                     case REQUEST_RESET_STREAK:
-                        this.provider.resetStreak(d[2]);
+                        this.provider.resetStreak(d[1]);
                         break;
                 }
             }, "API/Rewards[Receive]", "api.rewards.receive");

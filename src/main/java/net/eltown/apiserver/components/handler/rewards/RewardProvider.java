@@ -117,13 +117,12 @@ public class RewardProvider {
     }
 
     public void resetStreak(final String player) {
-        final RewardPlayer rewardPlayer = this.rewardPlayers.get(player);
-        rewardPlayer.setDay(0);
-        rewardPlayer.setLastReward(0);
-        rewardPlayer.setOnlineTime(0);
+        this.rewardPlayers.get(player).setDay(0);
+        this.rewardPlayers.get(player).setLastReward(0);
+        this.rewardPlayers.get(player).setOnlineTime(0);
 
         CompletableFuture.runAsync(() -> {
-            this.playerDataCollection.updateOne(new Document("_id", player), new Document("$set", new Document("day", rewardPlayer.getDay()).append("lastReward", rewardPlayer.getLastReward()).append("onlineTime", rewardPlayer.getOnlineTime())));
+            this.playerDataCollection.updateOne(new Document("_id", player), new Document("$set", new Document("day", 0).append("lastReward", 0L).append("onlineTime", 0L)));
         });
     }
 
