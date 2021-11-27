@@ -9,6 +9,7 @@ import net.eltown.apiserver.components.data.Colors;
 import net.eltown.apiserver.components.data.LogLevel;
 import net.eltown.apiserver.components.handler.advancements.AdvancementsHandler;
 import net.eltown.apiserver.components.handler.bank.BankHandler;
+import net.eltown.apiserver.components.handler.crates.CratesHandler;
 import net.eltown.apiserver.components.handler.crypto.CryptoHandler;
 import net.eltown.apiserver.components.handler.drugs.DrugHandler;
 import net.eltown.apiserver.components.handler.economy.EconomyHandler;
@@ -61,6 +62,7 @@ public class Server {
     private QuestHandler questHandler;
     private FriendHandler friendHandler;
     private SettingsHandler settingsHandler;
+    private CratesHandler cratesHandler;
 
     public Server() {
         instance = this;
@@ -156,6 +158,10 @@ public class Server {
         this.log(4, "Starte SettingsHandler...");
         this.settingsHandler = new SettingsHandler(this);
         this.log(4, "SettingsHandler erfolgreich gestartet.");
+
+        this.log(4, "Starte CratesHandler...");
+        this.cratesHandler = new CratesHandler(this);
+        this.log(4, "CratesHandler erfolgreich gestartet.");
 
         this.log("Server wurde erfolgreich gestartet.");
         //this.log(this.getDataFolder());
