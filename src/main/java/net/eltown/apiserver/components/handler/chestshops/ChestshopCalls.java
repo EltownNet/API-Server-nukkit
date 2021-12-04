@@ -1,0 +1,16 @@
+package net.eltown.apiserver.components.handler.chestshops;
+
+public enum ChestshopCalls {
+
+    REQUEST_LOAD_DATA,
+    CALLBACK_LOAD_DATA,
+    REQUEST_CREATE_CHESTSHOP,
+    REQUEST_UPDATE_AMOUNT,
+    REQUEST_UPDATE_PRICE,
+    REQUEST_UPDATE_ITEM,
+    REQUEST_REMOVE_SHOP,
+    REQUEST_SET_LICENSE,
+    REQUEST_SET_ADDITIONAL_SHOPS,
+    REQUEST_ADD_ADDITIONAL_SHOPS
+
+}

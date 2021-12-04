@@ -6,6 +6,7 @@ import net.eltown.apiserver.components.handler.crates.data.CrateReward;
 import net.eltown.apiserver.components.tinyrabbit.TinyRabbitListener;
 
 public class CratesHandler {
+
     private final Server server;
     private final CratesProvider provider;
     private final TinyRabbitListener tinyRabbitListener;
